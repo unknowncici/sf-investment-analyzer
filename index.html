@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SF Multifamily Investment Analyzer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 0 20px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 1000;
+    }
+    header h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    header h1 span.icon { font-size: 20px; }
+    .header-note {
+      font-size: 11px;
+      color: #64748b;
+      background: #0f172a;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #334155;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── MAP ── */
+    #map {
+      flex: 1;
+      z-index: 1;
+    }
+    .leaflet-popup-content-wrapper {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    }
+    .leaflet-popup-tip { background: #1e293b; }
+    .leaflet-popup-content { margin: 12px 16px; }
+    .popup-name { font-size: 13px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+    .popup-row { font-size: 12px; color: #94a3b8; margin: 2px 0; }
+    .popup-row strong { color: #e2e8f0; }
+    .popup-score-badge {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 370px;
+      background: #1e293b;
+      border-left: 1px solid #334155;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Controls */
+    .controls {
+      padding: 14px 16px;
+      border-bottom: 1px solid #334155;
+      flex-shrink: 0;
+    }
+    .controls label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #64748b;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .controls select {
+      width: 100%;
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      appearance: none;
+      cursor: pointer;
+      outline: none;
+    }
+    .controls select:hover { border-color: #475569; }
+
+    /* Legend */
+    .legend-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .legend-gradient {
+      flex: 1;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #ef4444, #f59e0b, #22c55e);
+    }
+    .legend-label {
+      font-size: 10px;
+      color: #64748b;
+      white-space: nowrap;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #334155;
+      flex-shrink: 0;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all .15s;
+    }
+    .tab:hover { color: #e2e8f0; }
+    .tab.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+
+    /* Rankings list */
+    #rankings-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    #rankings-panel::-webkit-scrollbar { width: 4px; }
+    #rankings-panel::-webkit-scrollbar-track { background: transparent; }
+    #rankings-panel::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .12s;
+      margin-bottom: 2px;
+    }
+    .rank-item:hover { background: #0f172a; }
+    .rank-item.selected { background: #0f172a; outline: 1px solid #38bdf8; }
+    .rank-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #0f172a;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .rank-item .name {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 500;
+      color: #e2e8f0;
+    }
+    .rank-item .metric-value {
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .score-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Detail panel */
+    #detail-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    #detail-panel::-webkit-scrollbar { width: 4px; }
+    #detail-panel::-webkit-scrollbar-track { background: transparent; }
+    #detail-panel::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+    .detail-header {
+      margin-bottom: 14px;
+    }
+    .detail-header h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+    }
+    .detail-header .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .metric-card {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 10px 12px;
+      border: 1px solid #1e293b;
+    }
+    .metric-card .mc-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    .metric-card .mc-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .metric-card .mc-sub {
+      font-size: 10px;
+      color: #475569;
+      margin-top: 2px;
+    }
+
+    .chart-wrap {
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 14px;
+      border: 1px solid #1e293b;
+    }
+    .chart-wrap h4 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    #radarChart { max-height: 200px; }
+
+    .pros-cons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .pros, .cons {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 10px 12px;
+      border: 1px solid #1e293b;
+    }
+    .pros h4 { font-size: 11px; font-weight: 700; color: #4ade80; margin-bottom: 6px; }
+    .cons h4 { font-size: 11px; font-weight: 700; color: #f87171; margin-bottom: 6px; }
+    .pros li, .cons li {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-left: 12px;
+      margin-bottom: 3px;
+    }
+
+    .notes-box {
+      background: #0f172a;
+      border-left: 3px solid #38bdf8;
+      border-radius: 0 8px 8px 0;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .rent-control-banner {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+      border: 1px solid #1d4ed8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: #93c5fd;
+      line-height: 1.5;
+    }
+    .rent-control-banner strong { color: #bfdbfe; display: block; margin-bottom: 2px; }
+
+    .placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #334155;
+      text-align: center;
+      padding: 32px;
+    }
+    .placeholder .big-icon { font-size: 48px; margin-bottom: 12px; }
+    .placeholder p { font-size: 13px; line-height: 1.6; }
+
+    /* Map custom popup close */
+    .leaflet-container a.leaflet-popup-close-button { color: #64748b; }
+    .leaflet-container a.leaflet-popup-close-button:hover { color: #e2e8f0; }
+
+    /* ── LISTINGS ── */
+    #listings-panel {
+      flex: 1;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+    }
+    .listings-filters {
+      padding: 10px 12px;
+      border-bottom: 1px solid #334155;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .filter-row {
+      display: flex;
+      gap: 6px;
+    }
+    .filter-row select, .filter-row input {
+      flex: 1;
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 11px;
+      outline: none;
+      appearance: none;
+    }
+    .filter-row select:hover, .filter-row input:hover { border-color: #475569; }
+    .filter-label {
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 2px;
+    }
+    .listings-count {
+      font-size: 11px;
+      color: #64748b;
+      padding: 6px 12px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0;
+    }
+    .listings-count span { color: #38bdf8; font-weight: 700; }
+    .listings-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    .listings-scroll::-webkit-scrollbar { width: 4px; }
+    .listings-scroll::-webkit-scrollbar-track { background: transparent; }
+    .listings-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+    .listing-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .listing-card:hover { border-color: #38bdf8; background: #0c1628; }
+
+    .lc-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .lc-address {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 3px;
+    }
+    .lc-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+    .tag-hood { background: #1e3a5f; color: #93c5fd; }
+    .tag-rc-yes { background: #450a0a; color: #fca5a5; }
+    .tag-rc-no { background: #14532d; color: #86efac; }
+    .tag-new { background: #1c1917; color: #fdba74; }
+
+    .lc-price {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .lc-price .price-main {
+      font-size: 15px;
+      font-weight: 800;
+      color: #f1f5f9;
+    }
+    .lc-price .price-sub {
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .lc-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .lc-metric {
+      background: #1e293b;
+      border-radius: 6px;
+      padding: 6px 8px;
+      text-align: center;
+    }
+    .lc-metric .lm-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .lc-metric .lm-label {
+      font-size: 9px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-top: 2px;
+    }
+
+    .lc-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #1e293b;
+    }
+    .lc-footer .broker { font-size: 10px; color: #475569; }
+    .lc-footer .dom {
+      font-size: 10px;
+      color: #64748b;
+    }
+    .lc-footer .dom.fresh { color: #4ade80; }
+
+    .data-disclaimer {
+      margin: 8px;
+      padding: 8px 10px;
+      background: #1c1917;
+      border: 1px solid #44403c;
+      border-radius: 8px;
+      font-size: 10px;
+      color: #78716c;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1><span class="icon">🏙️</span> SF Multifamily Investment Analyzer</h1>
+  <span class="header-note">Data is illustrative — verify with broker/MLS before investing</span>
+</header>
+
+<div class="main">
+  <div id="map"></div>
+
+  <div class="sidebar">
+    <!-- Controls -->
+    <div class="controls">
+      <label>Color map by metric</label>
+      <select id="metricSelect">
+        <option value="investmentScore">Overall Investment Score</option>
+        <option value="capRate">Cap Rate (%)</option>
+        <option value="rentGrowth5yr">5-Year Rent Growth (%)</option>
+        <option value="avgRent2BR">Avg 2BR Rent ($/mo)</option>
+        <option value="crimeScore">Safety Score (1–10)</option>
+        <option value="vacancyRate">Vacancy Rate (%) — lower better</option>
+      </select>
+      <div class="legend-bar">
+        <span class="legend-label" id="legendLow">Low</span>
+        <div class="legend-gradient"></div>
+        <span class="legend-label" id="legendHigh">High</span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="rankings">Rankings</div>
+      <div class="tab" data-tab="detail">Detail</div>
+      <div class="tab" data-tab="listings">Listings</div>
+    </div>
+
+    <!-- Rankings tab -->
+    <div id="rankings-panel"></div>
+
+    <!-- Detail tab -->
+    <div id="detail-panel" style="display:none">
+      <div class="placeholder">
+        <div class="big-icon">📍</div>
+        <p>Click a neighborhood on the map or in the rankings list to see detailed investment metrics.</p>
+      </div>
+    </div>
+
+    <!-- Listings tab -->
+    <div id="listings-panel">
+      <div class="listings-filters">
+        <div>
+          <div class="filter-label">Neighborhood</div>
+          <div class="filter-row">
+            <select id="filterHood">
+              <option value="">All Neighborhoods</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div style="flex:1">
+            <div class="filter-label">Max Price</div>
+            <select id="filterPrice">
+              <option value="">Any</option>
+              <option value="2000000">Under $2M</option>
+              <option value="3000000">Under $3M</option>
+              <option value="5000000">Under $5M</option>
+              <option value="8000000">Under $8M</option>
+            </select>
+          </div>
+          <div style="flex:1">
+            <div class="filter-label">Min Cap Rate</div>
+            <select id="filterCap">
+              <option value="">Any</option>
+              <option value="3">≥ 3.0%</option>
+              <option value="3.5">≥ 3.5%</option>
+              <option value="4">≥ 4.0%</option>
+              <option value="4.5">≥ 4.5%</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div style="flex:1">
+            <div class="filter-label">Min Units</div>
+            <select id="filterUnits">
+              <option value="">Any</option>
+              <option value="4">4+</option>
+              <option value="6">6+</option>
+              <option value="10">10+</option>
+            </select>
+          </div>
+          <div style="flex:1">
+            <div class="filter-label">Rent Control</div>
+            <select id="filterRC">
+              <option value="">All</option>
+              <option value="no">Post-1979 (no RC)</option>
+              <option value="yes">Pre-1979 (RC)</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div style="flex:1">
+            <div class="filter-label">Sort by</div>
+            <select id="sortBy">
+              <option value="capRate">Cap Rate ↓</option>
+              <option value="price">Price ↑</option>
+              <option value="pricePerUnit">Price/Unit ↑</option>
+              <option value="units">Units ↓</option>
+              <option value="dom">Days on Market ↑</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="listings-count" id="listingsCount"><span>0</span> listings found</div>
+      <div class="listings-scroll" id="listingsScroll"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  NEIGHBORHOOD DATA
+// ─────────────────────────────────────────────
+const neighborhoods = [
+  {
+    name: "Bayview-Hunters Point",
+    lat: 37.7308, lng: -122.3862,
+    avgRent2BR: 2800,
+    pricePerUnit: 580000,
+    capRate: 4.8,
+    rentGrowth5yr: 28,
+    crimeScore: 3,
+    vacancyRate: 5.5,
+    walkScore: 65,
+    transitScore: 72,
+    notes: "Highest cap rates in SF with major city investment underway. Gentrification in early stages — high upside but patient capital required.",
+    pros: ["Highest cap rates in SF", "Strong long-term appreciation", "City infrastructure investment", "Lower acquisition cost"],
+    cons: ["Elevated crime rate", "Limited current amenities", "Longer path to stabilization", "Higher management intensity"]
+  },
+  {
+    name: "Visitacion Valley",
+    lat: 37.7132, lng: -122.4106,
+    avgRent2BR: 2700,
+    pricePerUnit: 570000,
+    capRate: 4.5,
+    rentGrowth5yr: 30,
+    crimeScore: 4,
+    vacancyRate: 4.8,
+    walkScore: 70,
+    transitScore: 75,
+    notes: "Fastest projected rent growth in SF. Adjacent to Caltrain and improving retail corridor. Spillover demand from Bernal Heights and Excelsior.",
+    pros: ["Highest rent growth potential", "Affordable entry point", "Improving transit access", "Caltrain proximity"],
+    cons: ["Above-average crime", "Far from downtown core", "Slower appreciation historically", "Limited walkability"]
+  },
+  {
+    name: "Excelsior",
+    lat: 37.7237, lng: -122.4269,
+    avgRent2BR: 2900,
+    pricePerUnit: 640000,
+    capRate: 4.2,
+    rentGrowth5yr: 25,
+    crimeScore: 6,
+    vacancyRate: 4.0,
+    walkScore: 74,
+    transitScore: 78,
+    notes: "SF's largest residential neighborhood. Stable Latino community with improving safety and strong family tenant base. Good value relative to adjacent Mission.",
+    pros: ["Good cap rate for SF", "Stable long-term tenants", "Improving safety trend", "Strong community fabric"],
+    cons: ["Far from major employment", "Limited nightlife/retail", "Fewer luxury renters", "Transit could improve"]
+  },
+  {
+    name: "Tenderloin",
+    lat: 37.7835, lng: -122.4147,
+    avgRent2BR: 2600,
+    pricePerUnit: 460000,
+    capRate: 5.2,
+    rentGrowth5yr: 10,
+    crimeScore: 1,
+    vacancyRate: 7.0,
+    walkScore: 98,
+    transitScore: 100,
+    notes: "Highest cap rates in the city but the riskiest neighborhood. Perfect transit and Walk Score. Best suited for experienced operators with affordable housing focus.",
+    pros: ["Highest cap rate citywide", "Prime central location", "100 Transit Score", "Lowest acquisition cost/unit"],
+    cons: ["Highest crime in SF", "Highest vacancy rate", "Social service concentration", "Intensive management required"]
+  },
+  {
+    name: "Mission District",
+    lat: 37.7599, lng: -122.4148,
+    avgRent2BR: 3800,
+    pricePerUnit: 860000,
+    capRate: 3.8,
+    rentGrowth5yr: 18,
+    crimeScore: 5,
+    vacancyRate: 3.5,
+    walkScore: 93,
+    transitScore: 90,
+    notes: "SF's most dynamic rental market. Dense stock of pre-1979 rent-controlled buildings. High demand from tech and creative workers, strong restaurant scene drives retention.",
+    pros: ["Very high demand", "Excellent walkability", "Strong rent fundamentals", "Diverse renter pool"],
+    cons: ["Moderate crime", "Competitive/expensive market", "Rent control exposure", "Displacement pressure"]
+  },
+  {
+    name: "SoMa",
+    lat: 37.7785, lng: -122.4056,
+    avgRent2BR: 4200,
+    pricePerUnit: 950000,
+    capRate: 3.6,
+    rentGrowth5yr: 12,
+    crimeScore: 4,
+    vacancyRate: 4.5,
+    walkScore: 92,
+    transitScore: 96,
+    notes: "Tech-worker corridor with high rents but sensitive to tech sector cycles. Some newer stock not subject to rent control. Mixed-use development opportunities.",
+    pros: ["High absolute rents", "Tech employer proximity", "Excellent transit", "Some market-rate new stock"],
+    cons: ["Tech-cycle sensitivity", "Elevated crime", "Higher vacancy than peers", "Intense competition"]
+  },
+  {
+    name: "Western Addition / NOPA",
+    lat: 37.7786, lng: -122.4382,
+    avgRent2BR: 3700,
+    pricePerUnit: 900000,
+    capRate: 3.2,
+    rentGrowth5yr: 20,
+    crimeScore: 5,
+    vacancyRate: 3.8,
+    walkScore: 89,
+    transitScore: 87,
+    notes: "Increasingly popular with young professionals. Great Panhandle access, improving restaurant scene, and solid rental demand from USF and UCSF employees.",
+    pros: ["Growing popularity", "Good rent trajectory", "Panhandle/park access", "UCSF/USF demand"],
+    cons: ["Patchy blocks for safety", "Rent control on most stock", "Mid-tier cap rate", "Some deferred-maintenance stock"]
+  },
+  {
+    name: "Dogpatch",
+    lat: 37.7598, lng: -122.3878,
+    avgRent2BR: 4000,
+    pricePerUnit: 980000,
+    capRate: 3.2,
+    rentGrowth5yr: 20,
+    crimeScore: 7,
+    vacancyRate: 3.5,
+    walkScore: 84,
+    transitScore: 83,
+    notes: "One of SF's fastest-growing neighborhoods. Post-1979 buildings common, less rent control exposure. Design and tech companies anchor tenant demand.",
+    pros: ["Less rent control exposure", "Rapidly improving area", "Safer than most peers", "Waterfront access"],
+    cons: ["Expensive per unit", "Smaller multifamily stock", "Limited shopping", "Cal-train dependent"]
+  },
+  {
+    name: "Bernal Heights",
+    lat: 37.7397, lng: -122.4148,
+    avgRent2BR: 3700,
+    pricePerUnit: 950000,
+    capRate: 3.2,
+    rentGrowth5yr: 22,
+    crimeScore: 7,
+    vacancyRate: 3.2,
+    walkScore: 81,
+    transitScore: 78,
+    notes: "Highly desirable neighborhood with strong owner-occupant culture. Limited rental stock creates supply scarcity premium. Family and pet-friendly reputation.",
+    pros: ["Low vacancy / high demand", "Safe and family-friendly", "Strong appreciation trend", "Loyal tenants"],
+    cons: ["Very limited multifamily stock", "Expensive per door", "Limited transit", "Hilly terrain limits density"]
+  },
+  {
+    name: "Inner Sunset",
+    lat: 37.7630, lng: -122.4700,
+    avgRent2BR: 3400,
+    pricePerUnit: 860000,
+    capRate: 3.2,
+    rentGrowth5yr: 20,
+    crimeScore: 8,
+    vacancyRate: 3.0,
+    walkScore: 88,
+    transitScore: 80,
+    notes: "Adjacent to UCSF and Golden Gate Park. Extremely low vacancy; strong medical/academic tenant base. Fog but consistent demand, quiet residential character.",
+    pros: ["UCSF demand drives low vacancy", "Very safe neighborhood", "Near Golden Gate Park", "Good long-term appreciation"],
+    cons: ["Fog belt", "Mid-tier absolute rents", "Limited nightlife draw", "N-Judah dependent"]
+  },
+  {
+    name: "Inner Richmond",
+    lat: 37.7799, lng: -122.4638,
+    avgRent2BR: 3300,
+    pricePerUnit: 830000,
+    capRate: 3.3,
+    rentGrowth5yr: 19,
+    crimeScore: 7,
+    vacancyRate: 3.2,
+    walkScore: 86,
+    transitScore: 79,
+    notes: "Strong Asian-American community with excellent restaurants and stable tenant base. Slightly undervalued vs. Inner Sunset. Good Clement St. retail corridor.",
+    pros: ["Stable community", "Good relative value", "Excellent restaurants / walkability", "Low turnover tenants"],
+    cons: ["Fog and wind", "Distance from BART", "Conservative rent growth", "Less tech-worker draw"]
+  },
+  {
+    name: "Outer Sunset",
+    lat: 37.7528, lng: -122.5004,
+    avgRent2BR: 3000,
+    pricePerUnit: 730000,
+    capRate: 3.4,
+    rentGrowth5yr: 20,
+    crimeScore: 8,
+    vacancyRate: 2.8,
+    walkScore: 74,
+    transitScore: 70,
+    notes: "Most affordable safe neighborhood in SF. Surfer and family culture. Low vacancy but also lower absolute rents. Good for stable long-term holds.",
+    pros: ["Affordable acquisition", "Very safe", "Low vacancy", "Stable working-class demand"],
+    cons: ["Heavy fog and wind", "Far from downtown", "Lower absolute rents", "Car-dependent areas"]
+  },
+  {
+    name: "Outer Richmond",
+    lat: 37.7768, lng: -122.4995,
+    avgRent2BR: 3100,
+    pricePerUnit: 770000,
+    capRate: 3.3,
+    rentGrowth5yr: 18,
+    crimeScore: 8,
+    vacancyRate: 2.8,
+    walkScore: 74,
+    transitScore: 70,
+    notes: "Stable and safe. Golden Gate Park to the south. Similar profile to Outer Sunset — excellent for conservative buy-and-hold investors seeking stability over upside.",
+    pros: ["Very safe", "Ultra-low vacancy", "Park proximity", "Stable tenants"],
+    cons: ["Furthest from downtown", "Lowest rent growth of safe hoods", "Fog belt", "Limited nightlife"]
+  },
+  {
+    name: "Potrero Hill",
+    lat: 37.7609, lng: -122.4009,
+    avgRent2BR: 3900,
+    pricePerUnit: 1050000,
+    capRate: 2.8,
+    rentGrowth5yr: 20,
+    crimeScore: 7,
+    vacancyRate: 3.0,
+    walkScore: 84,
+    transitScore: 80,
+    notes: "Sunny micro-climate and panoramic views. Tech and biotech workers from Mission Bay and China Basin anchor demand. Limited multifamily supply constrains vacancy.",
+    pros: ["Sunny micro-climate", "Tech/biotech demand", "Improving area", "Views premium"],
+    cons: ["Expensive per unit", "Hilly / transit gaps", "Limited walkability at edges", "Lower cap rate"]
+  },
+  {
+    name: "Haight-Ashbury",
+    lat: 37.7692, lng: -122.4481,
+    avgRent2BR: 3600,
+    pricePerUnit: 920000,
+    capRate: 3.0,
+    rentGrowth5yr: 15,
+    crimeScore: 6,
+    vacancyRate: 3.5,
+    walkScore: 90,
+    transitScore: 83,
+    notes: "Iconic neighborhood with highly walkable commercial corridor. Older rent-controlled stock dominates. Tourism traffic and Panhandle access support tenant retention.",
+    pros: ["Iconic walkable corridor", "Diverse renter mix", "Good transit", "Strong community identity"],
+    cons: ["Mostly rent-controlled stock", "Slower rent growth", "Some street issues near Haight", "Competitive acquisitions"]
+  },
+  {
+    name: "Hayes Valley",
+    lat: 37.7759, lng: -122.4228,
+    avgRent2BR: 4000,
+    pricePerUnit: 1050000,
+    capRate: 2.8,
+    rentGrowth5yr: 18,
+    crimeScore: 6,
+    vacancyRate: 3.0,
+    walkScore: 95,
+    transitScore: 92,
+    notes: "One of SF's hottest neighborhoods. Exceptional walkability, boutique retail, great dining. Older stock available but competition for well-located buildings is fierce.",
+    pros: ["Exceptional walkability (95)", "Trendy dining / retail", "Strong renter demand", "Central location"],
+    cons: ["Expensive per unit", "Lower cap rate", "Competitive acquisition market", "Proximity to Civic Center issues"]
+  },
+  {
+    name: "Glen Park",
+    lat: 37.7338, lng: -122.4344,
+    avgRent2BR: 3500,
+    pricePerUnit: 900000,
+    capRate: 3.0,
+    rentGrowth5yr: 20,
+    crimeScore: 8,
+    vacancyRate: 2.8,
+    walkScore: 78,
+    transitScore: 80,
+    notes: "Village-like feel with BART and Muni access. Growing spillover from Noe Valley. Very safe, family-oriented, with limited multifamily supply creating premium.",
+    pros: ["BART access", "Very safe", "Village-like feel", "Low supply = scarcity premium"],
+    cons: ["Limited multifamily stock", "Lower absolute rents vs. Noe", "Less vibrant nightlife", "Car useful for western parts"]
+  },
+  {
+    name: "Castro",
+    lat: 37.7609, lng: -122.4350,
+    avgRent2BR: 3900,
+    pricePerUnit: 1100000,
+    capRate: 2.7,
+    rentGrowth5yr: 16,
+    crimeScore: 7,
+    vacancyRate: 2.8,
+    walkScore: 95,
+    transitScore: 89,
+    notes: "Historic and stable. Low vacancy due to strong neighborhood identity. High demand from LGBTQ+ community, young professionals, and restaurant workers.",
+    pros: ["Low vacancy / stable tenants", "Vibrant commercial corridor", "Strong community identity", "Excellent transit"],
+    cons: ["Expensive per unit", "Lower cap rate", "Slower rent growth", "Mostly older rent-controlled stock"]
+  },
+  {
+    name: "Noe Valley",
+    lat: 37.7502, lng: -122.4326,
+    avgRent2BR: 4000,
+    pricePerUnit: 1200000,
+    capRate: 2.5,
+    rentGrowth5yr: 15,
+    crimeScore: 9,
+    vacancyRate: 2.5,
+    walkScore: 91,
+    transitScore: 82,
+    notes: "Safest and most sought-after family neighborhood. Premium acquisition prices reflect ultra-low risk. Best suited for capital preservation with modest yield.",
+    pros: ["Safest in SF (9/10)", "Near-zero vacancy", "Top school proximity", "Strong long-term value"],
+    cons: ["Lowest cap rate in set", "Very expensive per unit", "Stroller-demographic may move out", "Modest rent growth"]
+  },
+  {
+    name: "Chinatown",
+    lat: 37.7941, lng: -122.4078,
+    avgRent2BR: 2400,
+    pricePerUnit: 620000,
+    capRate: 3.2,
+    rentGrowth5yr: 15,
+    crimeScore: 5,
+    vacancyRate: 2.8,
+    walkScore: 96,
+    transitScore: 95,
+    notes: "Dense and central. Low absolute rents but also low acquisition cost. Strong cultural identity supports tenant retention. Prime location near Financial District.",
+    pros: ["Low acquisition cost", "Near Financial District", "Perfect transit access", "Stable community"],
+    cons: ["Low absolute rents", "Rent control on most stock", "Density/maintenance challenges", "Modest rent growth"]
+  },
+  {
+    name: "North Beach",
+    lat: 37.8061, lng: -122.4103,
+    avgRent2BR: 4500,
+    pricePerUnit: 1400000,
+    capRate: 2.3,
+    rentGrowth5yr: 13,
+    crimeScore: 6,
+    vacancyRate: 2.5,
+    walkScore: 95,
+    transitScore: 92,
+    notes: "Tourist magnet with high short-term rental potential (where permitted). Low inventory of true multifamily. Trophy location but yield is the lowest tier.",
+    pros: ["Trophy location", "High absolute rents", "Low vacancy", "STR upside where permitted"],
+    cons: ["Very expensive per unit", "Low cap rate", "Limited multifamily stock", "Tourist congestion"]
+  },
+  {
+    name: "Nob Hill",
+    lat: 37.7930, lng: -122.4161,
+    avgRent2BR: 4200,
+    pricePerUnit: 1200000,
+    capRate: 2.6,
+    rentGrowth5yr: 14,
+    crimeScore: 6,
+    vacancyRate: 2.8,
+    walkScore: 97,
+    transitScore: 97,
+    notes: "Prime central location with cable car access. Dense residential mix. Proximity to Financial District and hospitals drives professional renter demand.",
+    pros: ["Best walkability (97)", "Best transit (97)", "Central location", "Professional renter base"],
+    cons: ["Expensive per unit", "Lower cap rate", "Near Tenderloin", "Older stock maintenance costs"]
+  },
+  {
+    name: "Russian Hill",
+    lat: 37.8012, lng: -122.4158,
+    avgRent2BR: 4800,
+    pricePerUnit: 1600000,
+    capRate: 2.2,
+    rentGrowth5yr: 13,
+    crimeScore: 8,
+    vacancyRate: 2.3,
+    walkScore: 95,
+    transitScore: 90,
+    notes: "Iconic SF neighborhood with views, Lombard St., and high-income tenants. Trophy asset territory — near-zero vacancy but entry price is among the highest.",
+    pros: ["High-income tenants", "Trophy views / iconic area", "Very safe", "Near-zero vacancy"],
+    cons: ["Among highest price/unit", "Lowest cap rates", "Steep streets / access", "Few transactions"]
+  },
+  {
+    name: "Pacific Heights",
+    lat: 37.7925, lng: -122.4382,
+    avgRent2BR: 5000,
+    pricePerUnit: 1800000,
+    capRate: 2.0,
+    rentGrowth5yr: 12,
+    crimeScore: 9,
+    vacancyRate: 2.2,
+    walkScore: 92,
+    transitScore: 83,
+    notes: "SF's most exclusive residential neighborhood. Lowest cap rate in city. Suitable for UHNW investors seeking capital preservation and prestige over yield.",
+    pros: ["Highest absolute rents", "Ultra-safe (9/10)", "Trophy prestige", "Near-zero vacancy"],
+    cons: ["Lowest cap rate (2.0%)", "Highest price per unit", "Extremely competitive market", "Minimal yield for price"]
+  },
+  {
+    name: "Marina",
+    lat: 37.8030, lng: -122.4366,
+    avgRent2BR: 4500,
+    pricePerUnit: 1400000,
+    capRate: 2.3,
+    rentGrowth5yr: 14,
+    crimeScore: 9,
+    vacancyRate: 2.3,
+    walkScore: 90,
+    transitScore: 82,
+    notes: "Young professional hub with fitness studios, cafes, and bay views. Very safe with affluent tenant base. Liquefaction zone adds some insurance cost and risk consideration.",
+    pros: ["Very safe (9/10)", "Affluent young professional tenants", "Low vacancy", "Vibrant commercial strip"],
+    cons: ["Liquefaction earthquake risk", "Expensive per unit", "Low cap rate", "Auto-dependent for some errands"]
+  }
+];
+
+// ─────────────────────────────────────────────
+//  SCORE COMPUTATION
+// ─────────────────────────────────────────────
+function computeScores() {
+  const capMin = 2.0, capMax = 5.5;
+  const growthMin = 10, growthMax = 30;
+  const crimeMin = 1, crimeMax = 10;
+  const vacMin = 2.0, vacMax = 7.5;
+
+  neighborhoods.forEach(n => {
+    const capScore = (n.capRate - capMin) / (capMax - capMin) * 100;
+    const growthScore = (n.rentGrowth5yr - growthMin) / (growthMax - growthMin) * 100;
+    const safetyScore = (n.crimeScore - crimeMin) / (crimeMax - crimeMin) * 100;
+    const demandScore = (n.walkScore + n.transitScore) / 2;
+    const vacScore = (1 - (n.vacancyRate - vacMin) / (vacMax - vacMin)) * 100;
+
+    n.investmentScore = Math.round(
+      capScore * 0.30 +
+      growthScore * 0.25 +
+      safetyScore * 0.20 +
+      demandScore * 0.15 +
+      vacScore * 0.10
+    );
+
+    // Normalized radar values (0-100)
+    n._radar = {
+      capRate: capScore,
+      rentGrowth: growthScore,
+      safety: safetyScore,
+      demand: demandScore,
+      lowVacancy: vacScore
+    };
+  });
+
+  // Sort by investmentScore desc
+  neighborhoods.sort((a, b) => b.investmentScore - a.investmentScore);
+}
+
+computeScores();
+
+// ─────────────────────────────────────────────
+//  COLOR HELPERS
+// ─────────────────────────────────────────────
+function scoreToColor(score) {
+  // 0–100 → red → yellow → green
+  if (score >= 66) {
+    const t = (score - 66) / 34;
+    const r = Math.round(34 + (34-34)*t);
+    const g = Math.round(197 + (197-197)*t);
+    const b = Math.round(94 + (94-94)*t);
+    // green hue
+    const hue = 120 - (100 - score) * 0.8;
+    return `hsl(${hue}, 80%, 50%)`;
+  }
+  if (score >= 33) {
+    const hue = 45 + (score - 33) * (75/33);
+    return `hsl(${hue}, 85%, 52%)`;
+  }
+  const hue = (score / 33) * 30;
+  return `hsl(${hue}, 85%, 50%)`;
+}
+
+function metricToNorm(n, metric) {
+  // Returns 0-1 where 1 = best for investment
+  switch(metric) {
+    case 'investmentScore': return n.investmentScore / 100;
+    case 'capRate': return (n.capRate - 2.0) / 3.5;
+    case 'rentGrowth5yr': return (n.rentGrowth5yr - 10) / 20;
+    case 'avgRent2BR': return (n.avgRent2BR - 2400) / 2600;
+    case 'crimeScore': return (n.crimeScore - 1) / 9;
+    case 'vacancyRate': return 1 - (n.vacancyRate - 2) / 5.5; // inverted
+    default: return 0.5;
+  }
+}
+
+function metricLabel(metric, n) {
+  switch(metric) {
+    case 'investmentScore': return `Score: ${n.investmentScore}`;
+    case 'capRate': return `${n.capRate}% cap`;
+    case 'rentGrowth5yr': return `+${n.rentGrowth5yr}% 5yr`;
+    case 'avgRent2BR': return `$${n.avgRent2BR.toLocaleString()}/mo`;
+    case 'crimeScore': return `Safety ${n.crimeScore}/10`;
+    case 'vacancyRate': return `${n.vacancyRate}% vacancy`;
+    default: return '';
+  }
+}
+
+// ─────────────────────────────────────────────
+//  MAP SETUP
+// ─────────────────────────────────────────────
+const map = L.map('map', {
+  center: [37.762, -122.435],
+  zoom: 13,
+  zoomControl: true
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
+
+// Store markers
+const markers = {};
+let selectedNeighborhood = null;
+let radarChart = null;
+
+function createMarker(n) {
+  const norm = metricToNorm(n, currentMetric);
+  const score01 = norm;
+  const hue = score01 * 120; // 0=red, 120=green
+  const color = `hsl(${hue}, 80%, 52%)`;
+
+  const marker = L.circleMarker([n.lat, n.lng], {
+    radius: 14,
+    fillColor: color,
+    color: '#1e293b',
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.85
+  }).addTo(map);
+
+  // Popup content
+  const scoreBg = n.investmentScore >= 60 ? '#166534' : n.investmentScore >= 40 ? '#854d0e' : '#7f1d1d';
+  const scoreColor = n.investmentScore >= 60 ? '#4ade80' : n.investmentScore >= 40 ? '#fbbf24' : '#f87171';
+  marker.bindPopup(`
+    <div class="popup-name">${n.name}</div>
+    <div class="popup-row">Avg 2BR Rent: <strong>$${n.avgRent2BR.toLocaleString()}/mo</strong></div>
+    <div class="popup-row">Price / Unit: <strong>~$${(n.pricePerUnit/1000).toFixed(0)}K</strong></div>
+    <div class="popup-row">Cap Rate: <strong>${n.capRate}%</strong></div>
+    <div class="popup-row">5yr Rent Growth: <strong>+${n.rentGrowth5yr}%</strong></div>
+    <div class="popup-row">Safety: <strong>${n.crimeScore}/10</strong></div>
+    <span class="popup-score-badge" style="background:${scoreBg};color:${scoreColor}">
+      Investment Score: ${n.investmentScore}/100
+    </span>
+  `);
+
+  marker.on('click', () => selectNeighborhood(n.name));
+  marker.on('mouseover', () => marker.openPopup());
+
+  return marker;
+}
+
+let currentMetric = 'investmentScore';
+
+function renderMarkers() {
+  // Update all marker colors
+  neighborhoods.forEach(n => {
+    if (markers[n.name]) {
+      map.removeLayer(markers[n.name]);
+    }
+    markers[n.name] = createMarker(n);
+  });
+}
+
+renderMarkers();
+
+// ─────────────────────────────────────────────
+//  RANKINGS LIST
+// ─────────────────────────────────────────────
+function renderRankings() {
+  const panel = document.getElementById('rankings-panel');
+  panel.innerHTML = '';
+
+  const sorted = [...neighborhoods].sort((a, b) => {
+    const av = metricToNorm(a, currentMetric);
+    const bv = metricToNorm(b, currentMetric);
+    return bv - av;
+  });
+
+  sorted.forEach((n, i) => {
+    const norm = metricToNorm(n, currentMetric);
+    const hue = norm * 120;
+    const color = `hsl(${hue}, 80%, 52%)`;
+
+    const item = document.createElement('div');
+    item.className = 'rank-item' + (selectedNeighborhood === n.name ? ' selected' : '');
+    item.dataset.name = n.name;
+    item.innerHTML = `
+      <div class="rank-num">${i + 1}</div>
+      <div class="score-dot" style="background:${color}"></div>
+      <div class="name">${n.name}</div>
+      <div class="metric-value" style="color:${color}">${metricLabel(currentMetric, n)}</div>
+    `;
+    item.addEventListener('click', () => selectNeighborhood(n.name));
+    panel.appendChild(item);
+  });
+}
+
+renderRankings();
+
+// ─────────────────────────────────────────────
+//  DETAIL PANEL
+// ─────────────────────────────────────────────
+function renderDetail(name) {
+  const n = neighborhoods.find(x => x.name === name);
+  if (!n) return;
+
+  const panel = document.getElementById('detail-panel');
+  const score = n.investmentScore;
+  const scoreBg = score >= 60 ? '#14532d' : score >= 40 ? '#451a03' : '#450a0a';
+  const scoreColor = score >= 60 ? '#4ade80' : score >= 40 ? '#fbbf24' : '#f87171';
+  const scoreLabel = score >= 70 ? 'Strong Buy' : score >= 55 ? 'Good' : score >= 40 ? 'Fair' : 'Risky';
+  const grm = (n.pricePerUnit / (n.avgRent2BR * 12)).toFixed(1);
+
+  panel.innerHTML = `
+    <div class="detail-header">
+      <h2>${n.name}</h2>
+      <span class="score-badge" style="background:${scoreBg};color:${scoreColor}">
+        ${score}/100 — ${scoreLabel}
+      </span>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="mc-label">Avg 2BR Rent</div>
+        <div class="mc-value">$${n.avgRent2BR.toLocaleString()}</div>
+        <div class="mc-sub">per month</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-label">Price / Unit</div>
+        <div class="mc-value">~$${(n.pricePerUnit/1000).toFixed(0)}K</div>
+        <div class="mc-sub">median ask</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-label">Cap Rate</div>
+        <div class="mc-value" style="color:${n.capRate >= 4 ? '#4ade80' : n.capRate >= 3 ? '#fbbf24' : '#f87171'}">${n.capRate}%</div>
+        <div class="mc-sub">gross cap</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-label">Gross Rent Multi.</div>
+        <div class="mc-value">${grm}×</div>
+        <div class="mc-sub">lower = better</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-label">5-Yr Rent Growth</div>
+        <div class="mc-value" style="color:#38bdf8">+${n.rentGrowth5yr}%</div>
+        <div class="mc-sub">estimated</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-label">Vacancy Rate</div>
+        <div class="mc-value" style="color:${n.vacancyRate <= 3 ? '#4ade80' : n.vacancyRate <= 5 ? '#fbbf24' : '#f87171'}">${n.vacancyRate}%</div>
+        <div class="mc-sub">local market</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-label">Safety Score</div>
+        <div class="mc-value" style="color:${n.crimeScore >= 7 ? '#4ade80' : n.crimeScore >= 5 ? '#fbbf24' : '#f87171'}">${n.crimeScore}/10</div>
+        <div class="mc-sub">1=high crime</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-label">Walk / Transit</div>
+        <div class="mc-value">${n.walkScore} / ${n.transitScore}</div>
+        <div class="mc-sub">out of 100</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <h4>Metric Radar</h4>
+      <canvas id="radarChart"></canvas>
+    </div>
+
+    <div class="notes-box">${n.notes}</div>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>▲ Pros</h4>
+        <ul>${n.pros.map(p => `<li>${p}</li>`).join('')}</ul>
+      </div>
+      <div class="cons">
+        <h4>▼ Cons</h4>
+        <ul>${n.cons.map(c => `<li>${c}</li>`).join('')}</ul>
+      </div>
+    </div>
+
+    <div class="rent-control-banner">
+      <strong>SF Rent Control Note</strong>
+      Buildings built before June 13, 1979 are subject to SF Rent Ordinance. Rent increases capped at ~60% of CPI. Costa-Hawkins allows market rate on vacancy. Always verify construction date before acquisition.
+    </div>
+  `;
+
+  // Destroy previous chart
+  if (radarChart) { radarChart.destroy(); radarChart = null; }
+
+  const ctx = document.getElementById('radarChart');
+  if (ctx) {
+    radarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Cap Rate', 'Rent Growth', 'Safety', 'Walkability', 'Low Vacancy'],
+        datasets: [{
+          label: n.name,
+          data: [
+            n._radar.capRate,
+            n._radar.rentGrowth,
+            n._radar.safety,
+            n._radar.demand,
+            n._radar.lowVacancy
+          ],
+          fill: true,
+          backgroundColor: 'rgba(56,189,248,0.15)',
+          borderColor: '#38bdf8',
+          pointBackgroundColor: '#38bdf8',
+          pointBorderColor: '#0f172a',
+          pointHoverBackgroundColor: '#f1f5f9',
+          pointHoverBorderColor: '#38bdf8',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+          r: {
+            min: 0, max: 100,
+            ticks: { display: false, stepSize: 25 },
+            grid: { color: '#1e3a5f' },
+            angleLines: { color: '#1e3a5f' },
+            pointLabels: {
+              color: '#94a3b8',
+              font: { size: 10 }
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  }
+}
+
+// ─────────────────────────────────────────────
+//  SELECT NEIGHBORHOOD
+// ─────────────────────────────────────────────
+function selectNeighborhood(name) {
+  selectedNeighborhood = name;
+
+  // Update rankings highlight
+  document.querySelectorAll('.rank-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.name === name);
+  });
+
+  // Switch to detail tab
+  switchTab('detail');
+  renderDetail(name);
+
+  // Pan map
+  const n = neighborhoods.find(x => x.name === name);
+  if (n) map.panTo([n.lat, n.lng], { animate: true });
+}
+
+// ─────────────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.getElementById('rankings-panel').style.display = tab === 'rankings' ? 'block' : 'none';
+  document.getElementById('detail-panel').style.display = tab === 'detail' ? 'block' : 'none';
+  const lp = document.getElementById('listings-panel');
+  lp.style.display = tab === 'listings' ? 'flex' : 'none';
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+});
+
+// ─────────────────────────────────────────────
+//  METRIC SELECTOR
+// ─────────────────────────────────────────────
+const legendLabels = {
+  investmentScore: ['Low Score', 'High Score'],
+  capRate: ['Low Cap Rate', 'High Cap Rate'],
+  rentGrowth5yr: ['Slow Growth', 'Fast Growth'],
+  avgRent2BR: ['Lower Rent', 'Higher Rent'],
+  crimeScore: ['High Crime', 'Very Safe'],
+  vacancyRate: ['High Vacancy', 'Low Vacancy']
+};
+
+document.getElementById('metricSelect').addEventListener('change', function() {
+  currentMetric = this.value;
+  const [lo, hi] = legendLabels[currentMetric];
+  document.getElementById('legendLow').textContent = lo;
+  document.getElementById('legendHigh').textContent = hi;
+  renderMarkers();
+  renderRankings();
+});
+
+// ─────────────────────────────────────────────
+//  LISTINGS DATA (sample/illustrative)
+// ─────────────────────────────────────────────
+const listings = [
+  // ── Bayview-Hunters Point ──
+  { id:1,  address:"2237 Armstrong St",     neighborhood:"Bayview-Hunters Point", units:4,  price:1180000, capRate:4.9, avgRent:2750, yearBuilt:1958, sqft:3600,  dom:8,  broker:"Marcus & Millichap" },
+  { id:2,  address:"1895 Cesar Chavez St",  neighborhood:"Bayview-Hunters Point", units:8,  price:2350000, capRate:4.7, avgRent:2800, yearBuilt:1962, sqft:6800,  dom:21, broker:"Colliers SF" },
+  { id:3,  address:"4420 3rd St",           neighborhood:"Bayview-Hunters Point", units:6,  price:1750000, capRate:4.8, avgRent:2700, yearBuilt:1955, sqft:5100,  dom:35, broker:"Compass Commercial" },
+  // ── Visitacion Valley ──
+  { id:4,  address:"74 Raymond Ave",        neighborhood:"Visitacion Valley",     units:4,  price:1100000, capRate:4.6, avgRent:2650, yearBuilt:1948, sqft:3200,  dom:14, broker:"Vanguard Properties" },
+  { id:5,  address:"280 Leland Ave",        neighborhood:"Visitacion Valley",     units:6,  price:1620000, capRate:4.4, avgRent:2700, yearBuilt:1961, sqft:4800,  dom:42, broker:"Marcus & Millichap" },
+  // ── Excelsior ──
+  { id:6,  address:"4401 Mission St",       neighborhood:"Excelsior",             units:6,  price:1790000, capRate:4.3, avgRent:2900, yearBuilt:1971, sqft:5200,  dom:19, broker:"Kidder Mathews" },
+  { id:7,  address:"246 Persia Ave",        neighborhood:"Excelsior",             units:4,  price:1380000, capRate:4.1, avgRent:2850, yearBuilt:1955, sqft:3400,  dom:7,  broker:"Colliers SF" },
+  { id:8,  address:"1530 Geneva Ave",       neighborhood:"Excelsior",             units:10, price:3100000, capRate:4.0, avgRent:2900, yearBuilt:1968, sqft:8500,  dom:28, broker:"Marcus & Millichap" },
+  // ── Tenderloin ──
+  { id:9,  address:"340 Turk St",           neighborhood:"Tenderloin",            units:12, price:2200000, capRate:5.1, avgRent:2500, yearBuilt:1921, sqft:9200,  dom:55, broker:"NAI Northern California" },
+  { id:10, address:"168 Eddy St",           neighborhood:"Tenderloin",            units:8,  price:1480000, capRate:5.3, avgRent:2600, yearBuilt:1915, sqft:6100,  dom:72, broker:"Compass Commercial" },
+  // ── Mission District ──
+  { id:11, address:"3150 24th St",          neighborhood:"Mission District",      units:6,  price:2750000, capRate:3.9, avgRent:3800, yearBuilt:1960, sqft:5400,  dom:11, broker:"Coldwell Banker Commercial" },
+  { id:12, address:"741 Valencia St",       neighborhood:"Mission District",      units:9,  price:4150000, capRate:3.7, avgRent:3700, yearBuilt:1964, sqft:7800,  dom:16, broker:"CBRE SF" },
+  { id:13, address:"2900 Mission St",       neighborhood:"Mission District",      units:5,  price:2100000, capRate:4.0, avgRent:3850, yearBuilt:1957, sqft:4500,  dom:5,  broker:"Marcus & Millichap" },
+  // ── SoMa ──
+  { id:14, address:"488 Brannan St",        neighborhood:"SoMa",                  units:12, price:5750000, capRate:3.6, avgRent:4100, yearBuilt:2001, sqft:10200, dom:30, broker:"JLL SF" },
+  { id:15, address:"85 Bluxome St",         neighborhood:"SoMa",                  units:8,  price:4050000, capRate:3.5, avgRent:4200, yearBuilt:1985, sqft:7200,  dom:18, broker:"Colliers SF" },
+  { id:16, address:"299 Fremont St",        neighborhood:"SoMa",                  units:20, price:9800000, capRate:3.4, avgRent:4000, yearBuilt:1997, sqft:18000, dom:44, broker:"CBRE SF" },
+  // ── Western Addition ──
+  { id:17, address:"1832 Fulton St",        neighborhood:"Western Addition / NOPA",units:6, price:2680000, capRate:3.3, avgRent:3700, yearBuilt:1958, sqft:5000,  dom:23, broker:"Vanguard Properties" },
+  { id:18, address:"2100 Broderick St",     neighborhood:"Western Addition / NOPA",units:4, price:1950000, capRate:3.1, avgRent:3600, yearBuilt:1945, sqft:3600,  dom:9,  broker:"Compass Commercial" },
+  // ── Dogpatch ──
+  { id:19, address:"1200 Tennessee St",     neighborhood:"Dogpatch",              units:6,  price:2900000, capRate:3.3, avgRent:4000, yearBuilt:2005, sqft:5800,  dom:12, broker:"Kidder Mathews" },
+  { id:20, address:"900 Illinois St",       neighborhood:"Dogpatch",              units:10, price:4800000, capRate:3.2, avgRent:3950, yearBuilt:2008, sqft:9200,  dom:38, broker:"JLL SF" },
+  // ── Inner Sunset ──
+  { id:21, address:"1742 9th Ave",          neighborhood:"Inner Sunset",          units:4,  price:2150000, capRate:3.2, avgRent:3400, yearBuilt:1928, sqft:3800,  dom:6,  broker:"Vanguard Properties" },
+  { id:22, address:"837 Irving St",         neighborhood:"Inner Sunset",          units:6,  price:2950000, capRate:3.1, avgRent:3350, yearBuilt:1922, sqft:5500,  dom:31, broker:"Compass Commercial" },
+  // ── Inner Richmond ──
+  { id:23, address:"432 6th Ave",           neighborhood:"Inner Richmond",        units:6,  price:2480000, capRate:3.4, avgRent:3300, yearBuilt:1962, sqft:5100,  dom:17, broker:"Marcus & Millichap" },
+  { id:24, address:"640 Clement St",        neighborhood:"Inner Richmond",        units:8,  price:3100000, capRate:3.2, avgRent:3250, yearBuilt:1955, sqft:6800,  dom:44, broker:"CBRE SF" },
+  // ── Outer Sunset ──
+  { id:25, address:"1825 46th Ave",         neighborhood:"Outer Sunset",          units:4,  price:1680000, capRate:3.5, avgRent:3000, yearBuilt:1940, sqft:3400,  dom:26, broker:"Compass Commercial" },
+  { id:26, address:"2200 Noriega St",       neighborhood:"Outer Sunset",          units:6,  price:2250000, capRate:3.4, avgRent:3050, yearBuilt:1952, sqft:5000,  dom:50, broker:"Vanguard Properties" },
+  // ── Potrero Hill ──
+  { id:27, address:"1400 Vermont St",       neighborhood:"Potrero Hill",          units:5,  price:2580000, capRate:2.9, avgRent:3900, yearBuilt:1968, sqft:4800,  dom:20, broker:"Colliers SF" },
+  { id:28, address:"1100 De Haro St",       neighborhood:"Potrero Hill",          units:8,  price:3800000, capRate:2.8, avgRent:3850, yearBuilt:1970, sqft:7200,  dom:33, broker:"JLL SF" },
+  // ── Bernal Heights ──
+  { id:29, address:"3200 Cortland Ave",     neighborhood:"Bernal Heights",        units:4,  price:2400000, capRate:3.1, avgRent:3700, yearBuilt:1950, sqft:3800,  dom:4,  broker:"Vanguard Properties" },
+  // ── Hayes Valley ──
+  { id:30, address:"410 Haight St",         neighborhood:"Hayes Valley",          units:5,  price:2850000, capRate:2.9, avgRent:4000, yearBuilt:1908, sqft:4400,  dom:15, broker:"Compass Commercial" },
+  { id:31, address:"340 Page St",           neighborhood:"Hayes Valley",          units:7,  price:3750000, capRate:2.8, avgRent:3950, yearBuilt:1925, sqft:6100,  dom:28, broker:"CBRE SF" },
+  // ── Glen Park ──
+  { id:32, address:"2800 Diamond St",       neighborhood:"Glen Park",             units:4,  price:2200000, capRate:3.0, avgRent:3500, yearBuilt:1963, sqft:3800,  dom:10, broker:"Marcus & Millichap" },
+  // ── Castro ──
+  { id:33, address:"4300 18th St",          neighborhood:"Castro",                units:4,  price:2550000, capRate:2.8, avgRent:3900, yearBuilt:1948, sqft:3600,  dom:9,  broker:"Vanguard Properties" },
+  // ── Noe Valley ──
+  { id:34, address:"4000 24th St",          neighborhood:"Noe Valley",            units:4,  price:2850000, capRate:2.6, avgRent:4000, yearBuilt:1919, sqft:3800,  dom:3,  broker:"Compass Commercial" },
+  { id:35, address:"1260 Sanchez St",       neighborhood:"Noe Valley",            units:6,  price:4100000, capRate:2.5, avgRent:3950, yearBuilt:1935, sqft:5500,  dom:22, broker:"CBRE SF" },
+  // ── Chinatown ──
+  { id:36, address:"750 Clay St",           neighborhood:"Chinatown",             units:8,  price:2100000, capRate:3.1, avgRent:2400, yearBuilt:1930, sqft:6800,  dom:60, broker:"NAI Northern California" },
+  // ── Marina ──
+  { id:37, address:"2350 Chestnut St",      neighborhood:"Marina",                units:4,  price:3200000, capRate:2.4, avgRent:4500, yearBuilt:1927, sqft:4000,  dom:14, broker:"CBRE SF" },
+];
+
+// ─────────────────────────────────────────────
+//  LISTINGS RENDERING
+// ─────────────────────────────────────────────
+
+// Populate neighborhood filter
+const hoodSelect = document.getElementById('filterHood');
+const hoodNames = [...new Set(listings.map(l => l.neighborhood))].sort();
+hoodNames.forEach(h => {
+  const opt = document.createElement('option');
+  opt.value = h;
+  opt.textContent = h;
+  hoodSelect.appendChild(opt);
+});
+
+function isRentControlled(yearBuilt) {
+  return yearBuilt < 1979 || (yearBuilt === 1979 && true); // cutoff June 13 1979
+}
+
+function formatPrice(p) {
+  if (p >= 1000000) return '$' + (p / 1000000).toFixed(2).replace(/\.?0+$/, '') + 'M';
+  return '$' + (p / 1000).toFixed(0) + 'K';
+}
+
+function renderListings() {
+  const hood = document.getElementById('filterHood').value;
+  const maxPrice = parseFloat(document.getElementById('filterPrice').value) || Infinity;
+  const minCap = parseFloat(document.getElementById('filterCap').value) || 0;
+  const minUnits = parseInt(document.getElementById('filterUnits').value) || 0;
+  const rcFilter = document.getElementById('filterRC').value;
+  const sortKey = document.getElementById('sortBy').value;
+
+  let filtered = listings.filter(l => {
+    if (hood && l.neighborhood !== hood) return false;
+    if (l.price > maxPrice) return false;
+    if (l.capRate < minCap) return false;
+    if (l.units < minUnits) return false;
+    const rc = isRentControlled(l.yearBuilt);
+    if (rcFilter === 'yes' && !rc) return false;
+    if (rcFilter === 'no' && rc) return false;
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    switch(sortKey) {
+      case 'capRate': return b.capRate - a.capRate;
+      case 'price': return a.price - b.price;
+      case 'pricePerUnit': return (a.price/a.units) - (b.price/b.units);
+      case 'units': return b.units - a.units;
+      case 'dom': return a.dom - b.dom;
+    }
+    return 0;
+  });
+
+  document.getElementById('listingsCount').innerHTML = `<span>${filtered.length}</span> listing${filtered.length !== 1 ? 's' : ''} found`;
+
+  const scroll = document.getElementById('listingsScroll');
+  scroll.innerHTML = '';
+
+  if (filtered.length === 0) {
+    scroll.innerHTML = '<div style="padding:32px;text-align:center;color:#475569;font-size:13px;">No listings match your filters.</div>';
+    return;
+  }
+
+  // Disclaimer
+  const disc = document.createElement('div');
+  disc.className = 'data-disclaimer';
+  disc.textContent = 'Sample data only — not real MLS listings. For live listings use LoopNet, CoStar, or Marcus & Millichap SF.';
+  scroll.appendChild(disc);
+
+  filtered.forEach(l => {
+    const rc = isRentControlled(l.yearBuilt);
+    const pricePerUnit = Math.round(l.price / l.units);
+    const grm = (l.price / (l.avgRent * 12 * l.units)).toFixed(1);
+    const capColor = l.capRate >= 4 ? '#4ade80' : l.capRate >= 3 ? '#fbbf24' : '#f87171';
+    const isFresh = l.dom <= 14;
+
+    const card = document.createElement('div');
+    card.className = 'listing-card';
+    card.innerHTML = `
+      <div class="lc-top">
+        <div>
+          <div class="lc-address">${l.address}</div>
+          <div class="lc-tags">
+            <span class="tag tag-hood">${l.neighborhood}</span>
+            <span class="tag ${rc ? 'tag-rc-yes' : 'tag-rc-no'}">${rc ? 'Rent Controlled' : 'No Rent Control'}</span>
+            ${isFresh ? '<span class="tag tag-new">New</span>' : ''}
+          </div>
+        </div>
+        <div class="lc-price">
+          <div class="price-main">${formatPrice(l.price)}</div>
+          <div class="price-sub">${l.units} units · Built ${l.yearBuilt}</div>
+        </div>
+      </div>
+      <div class="lc-metrics">
+        <div class="lc-metric">
+          <div class="lm-val" style="color:${capColor}">${l.capRate}%</div>
+          <div class="lm-label">Cap Rate</div>
+        </div>
+        <div class="lc-metric">
+          <div class="lm-val">$${(pricePerUnit/1000).toFixed(0)}K</div>
+          <div class="lm-label">Per Unit</div>
+        </div>
+        <div class="lc-metric">
+          <div class="lm-val">${grm}×</div>
+          <div class="lm-label">GRM</div>
+        </div>
+        <div class="lc-metric">
+          <div class="lm-val">$${l.avgRent.toLocaleString()}</div>
+          <div class="lm-label">Avg Rent</div>
+        </div>
+      </div>
+      <div class="lc-footer">
+        <span class="broker">${l.broker}</span>
+        <span class="dom ${isFresh ? 'fresh' : ''}">${l.dom === 1 ? '1 day' : l.dom + ' days'} on market</span>
+      </div>
+    `;
+
+    // Click: go to neighborhood detail
+    card.addEventListener('click', () => {
+      selectNeighborhood(l.neighborhood);
+    });
+
+    scroll.appendChild(card);
+  });
+}
+
+// Wire up filters
+['filterHood','filterPrice','filterCap','filterUnits','filterRC','sortBy'].forEach(id => {
+  document.getElementById(id).addEventListener('change', renderListings);
+});
+
+// Render on first load
+renderListings();
+</script>
+</body>
+</html>
