@@ -7,10 +7,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --accent: #E05B44;
       --accent-bg: rgba(224,91,68,0.07);
@@ -20,787 +19,225 @@
       --page: #f7f4f0;
       --white: #ffffff;
     }
-
-    html, body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--page);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    .app-header {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
-      text-align: center;
-    }
-    .header-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: 0.5px;
-    }
-    .header-sub {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 3px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .page {
-      max-width: 520px;
-      margin: 0 auto;
-      padding-bottom: 48px;
-    }
-
-    .mode-wrap { padding: 18px 16px 0; }
-    .mode-toggle {
-      display: flex;
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .mode-btn {
-      flex: 1;
-      padding: 13px 8px;
-      border: none;
-      background: transparent;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--accent);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      transition: all 0.15s;
-    }
-    .mode-btn.active { background: var(--accent); color: #fff; }
-
-    .form-card {
-      margin: 14px 16px 0;
-      background: var(--white);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-    .form-sec {
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--border);
-    }
+    html, body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--page); color: var(--text); min-height: 100vh; }
+    .app-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 14px 20px; text-align: center; }
+    .header-logo { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; letter-spacing: 0.5px; }
+    .header-sub { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .page { max-width: 520px; margin: 0 auto; padding-bottom: 48px; }
+    .form-card { margin: 16px 16px 0; background: var(--white); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+    .form-sec { padding: 18px 20px; border-bottom: 1px solid var(--border); }
     .form-sec:last-child { border-bottom: none; }
-
-    .sec-title {
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 14px;
-    }
-
-    .field-label {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-      margin-bottom: 6px;
-      display: block;
-    }
+    .sec-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+    .sec-opt { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; color: var(--muted); }
+    .field-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 6px; display: block; }
     .field-row { display: flex; gap: 10px; }
     .field { flex: 1; }
-
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 9px;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      color: var(--text);
-      background: var(--white);
-      outline: none;
-      transition: border-color 0.15s;
-      -webkit-appearance: none;
-    }
+    input[type="text"], input[type="number"] { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 9px; font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text); background: var(--white); outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
     input[type="number"] { -moz-appearance: textfield; }
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
     input::placeholder { color: #c8c4be; }
     input:focus { border-color: var(--accent); }
-
-    .chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    .chip {
-      padding: 9px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 9px;
-      background: var(--white);
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.15s;
-      color: var(--text);
-      user-select: none;
-    }
-    .chip.active {
-      border-color: var(--accent);
-      background: var(--accent-bg);
-      color: var(--accent);
-    }
-
-    .unit-toggle {
-      display: flex;
-      border: 1.5px solid var(--border);
-      border-radius: 9px;
-      overflow: hidden;
-      background: var(--white);
-      height: 44px;
-    }
-    .unit-btn {
-      flex: 1;
-      border: none;
-      background: transparent;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--muted);
-      transition: all 0.15s;
-    }
-    .unit-btn.active {
-      background: var(--accent);
-      color: #fff;
-      margin: 3px;
-      border-radius: 6px;
-    }
-
-    .switch-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .switch-inner { display: flex; align-items: center; gap: 9px; cursor: pointer; }
-    .switch-label { font-size: 12px; color: var(--muted); }
-    .switch {
-      width: 44px;
-      height: 24px;
-      background: #d0ccc8;
-      border-radius: 12px;
-      position: relative;
-      transition: background 0.2s;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .switch.on { background: var(--accent); }
-    .switch::after {
-      content: '';
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #fff;
-      top: 3px;
-      left: 3px;
-      transition: left 0.2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,.18);
-    }
-    .switch.on::after { left: 23px; }
-
-    .cover-drop {
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 26px 20px;
-      text-align: center;
-      cursor: pointer;
-      background: var(--page);
-      transition: border-color 0.15s, background 0.15s;
-      margin-bottom: 12px;
-    }
+    .cover-drop { border: 2px dashed var(--border); border-radius: 12px; padding: 24px 20px; text-align: center; cursor: pointer; background: var(--page); transition: border-color 0.15s, background 0.15s; margin-bottom: 12px; }
     .cover-drop:hover { border-color: var(--accent); background: var(--accent-bg); }
     .cover-drop.has-img { padding: 8px; border-style: solid; }
-    .cover-drop-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.3; }
+    .cover-drop-icon { font-size: 26px; margin-bottom: 8px; opacity: 0.28; }
     .cover-drop-text { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
-    .cover-drop.has-img .cover-drop-icon,
-    .cover-drop.has-img .cover-drop-text { display: none; }
-    .cover-preview-img {
-      width: 100%;
-      max-height: 200px;
-      object-fit: contain;
-      border-radius: 8px;
-      display: none;
-    }
+    .cover-drop.has-img .cover-drop-icon, .cover-drop.has-img .cover-drop-text { display: none; }
+    .cover-preview-img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; display: none; }
     .cover-drop.has-img .cover-preview-img { display: block; }
-
-    .font-toggle {
-      display: flex;
-      border: 2px solid var(--accent);
-      border-radius: 9px;
-      overflow: hidden;
-      width: fit-content;
-    }
-    .font-btn {
-      padding: 9px 24px;
-      border: none;
-      background: transparent;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--accent);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .font-btn.active { background: var(--accent); color: #fff; }
-
-    .swatch-hint { font-size: 12px; color: var(--muted); margin: 6px 0 12px; line-height: 1.5; }
     .swatch-row { display: flex; flex-wrap: wrap; gap: 10px; }
-    .swatch {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2.5px solid transparent;
-      transition: transform 0.15s, box-shadow 0.15s;
-      flex-shrink: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .swatch { width: 42px; height: 42px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent; transition: transform 0.15s, box-shadow 0.15s; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
     .swatch:hover { transform: scale(1.08); }
-    .swatch.sel {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px #fff, 0 0 0 4.5px var(--accent);
-      transform: scale(1.1);
-    }
-    .sw-transparent {
-      background-image:
-        linear-gradient(45deg,#ccc 25%,transparent 25%),
-        linear-gradient(-45deg,#ccc 25%,transparent 25%),
-        linear-gradient(45deg,transparent 75%,#ccc 75%),
-        linear-gradient(-45deg,transparent 75%,#ccc 75%);
-      background-size: 14px 14px;
-      background-position: 0 0, 0 7px, 7px -7px, -7px 0;
-      background-color: #fff;
-    }
-    .sw-upload {
-      background: var(--page);
-      border: 2px dashed #c0bbb5;
-      font-size: 17px;
-      color: var(--muted);
-      font-weight: 600;
-    }
+    .swatch.sel { border-color: var(--accent); box-shadow: 0 0 0 2px #fff, 0 0 0 4.5px var(--accent); transform: scale(1.1); }
+    .sw-transparent { background-image: linear-gradient(45deg,#ccc 25%,transparent 25%), linear-gradient(-45deg,#ccc 25%,transparent 25%), linear-gradient(45deg,transparent 75%,#ccc 75%), linear-gradient(-45deg,transparent 75%,#ccc 75%); background-size: 14px 14px; background-position: 0 0, 0 7px, 7px -7px, -7px 0; background-color: #fff; }
+    .sw-upload { background: var(--page); border: 2px dashed #c0bbb5; font-size: 17px; color: var(--muted); font-weight: 600; }
     .sw-white { border: 2px solid #ddd !important; }
-
-    .preview-wrap {
-      margin: 14px 16px 0;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 16px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .preview-title {
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      align-self: flex-start;
-      margin-bottom: 16px;
-    }
-
-    #statCard {
-      width: 300px;
-      min-height: 440px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 38px 28px 28px;
-      position: relative;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .card-transparent {
-      background-image:
-        linear-gradient(45deg,#ddd 25%,transparent 25%),
-        linear-gradient(-45deg,#ddd 25%,transparent 25%),
-        linear-gradient(45deg,transparent 75%,#ddd 75%),
-        linear-gradient(-45deg,transparent 75%,#ddd 75%);
-      background-size: 18px 18px;
-      background-position: 0 0, 0 9px, 9px -9px, -9px 0;
-      background-color: #fff;
-    }
-
+    .preview-wrap { margin: 14px 16px 0; background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 20px 16px 24px; display: flex; flex-direction: column; align-items: center; }
+    .preview-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); align-self: flex-start; margin-bottom: 16px; }
+    #statCard { width: 300px; min-height: 440px; display: flex; flex-direction: column; align-items: center; padding: 38px 28px 28px; font-family: 'Inter', sans-serif; }
+    .card-transparent { background-image: linear-gradient(45deg,#ddd 25%,transparent 25%), linear-gradient(-45deg,#ddd 25%,transparent 25%), linear-gradient(45deg,transparent 75%,#ddd 75%), linear-gradient(-45deg,transparent 75%,#ddd 75%); background-size: 18px 18px; background-position: 0 0, 0 9px, 9px -9px, -9px 0; background-color: #fff; }
     .c-stats { width: 100%; text-align: center; }
     .c-stat { margin-bottom: 20px; }
-    .c-stat-label {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      margin-bottom: 3px;
-    }
-    .c-stat-value {
-      font-size: 33px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      line-height: 1.05;
-    }
-    .c-stat-value.underlined {
-      display: inline-block;
-      padding-bottom: 7px;
-      border-bottom: 3.5px solid #E05B44;
-    }
-
+    .c-stat-label { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; margin-bottom: 3px; }
+    .c-stat-value { font-size: 33px; font-weight: 800; letter-spacing: -1px; line-height: 1.05; }
+    .c-stat-value.underlined { display: inline-block; padding-bottom: 7px; border-bottom: 3.5px solid #E05B44; }
+    .c-extra { font-size: 16px; font-weight: 700; text-align: center; letter-spacing: -0.2px; margin-bottom: 16px; opacity: 0.85; }
     .c-icon { margin: 4px 0; flex-shrink: 0; }
     .c-icon svg { width: 92px; height: 74px; }
-
-    .c-cover {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin: 12px 0 6px;
-    }
-    .c-book-title {
-      font-size: 11.5px;
-      font-weight: 600;
-      text-align: center;
-      max-width: 220px;
-      line-height: 1.45;
-      opacity: 0.68;
-      margin-bottom: 8px;
-    }
-    .c-brand {
-      margin-top: auto;
-      padding-top: 14px;
-      text-align: center;
-    }
-    .c-brand-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-    .c-brand-tag {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      opacity: 0.45;
-      margin-top: 2px;
-    }
-
-    .save-btn {
-      display: block;
-      width: calc(100% - 32px);
-      margin: 14px 16px 0;
-      padding: 16px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 13px;
-      font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
-      transition: opacity 0.15s;
-    }
+    .c-cover { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; margin: 12px 0 6px; }
+    .c-book-title { font-size: 11.5px; font-weight: 600; text-align: center; max-width: 220px; line-height: 1.45; opacity: 0.68; margin-bottom: 8px; }
+    .c-brand { margin-top: auto; padding-top: 14px; text-align: center; }
+    .c-brand-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .c-brand-tag { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.4; margin-top: 2px; }
+    .save-btn { display: block; width: calc(100% - 32px); margin: 14px 16px 0; padding: 16px; background: var(--accent); color: #fff; border: none; border-radius: 13px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; text-align: center; transition: opacity 0.15s; }
     .save-btn:hover { opacity: 0.88; }
     .save-btn:active { opacity: 0.72; }
     .save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .save-btn-sub {
-      display: block;
-      font-size: 11px;
-      font-weight: 400;
-      opacity: 0.72;
-      margin-top: 4px;
-    }
-
+    .save-btn-sub { display: block; font-size: 11px; font-weight: 400; opacity: 0.72; margin-top: 4px; }
     #coverFileInput, #bgFileInput { display: none; }
-
-    @media (max-width: 380px) {
-      #statCard { width: 268px; }
-    }
+    @media (max-width: 380px) { #statCard { width: 268px; } }
   </style>
 </head>
 <body>
-
 <header class="app-header">
   <div class="header-logo">BeFreed</div>
   <div class="header-sub">Listening Stat Generator</div>
 </header>
-
 <div class="page">
-
-  <div class="mode-wrap">
-    <div class="mode-toggle">
-      <button class="mode-btn" id="modeBook" onclick="setMode('book')">📖 Physical Book</button>
-      <button class="mode-btn active" id="modeAudio" onclick="setMode('audiobook')">🎧 Audiobook</button>
-    </div>
-  </div>
-
   <div class="form-card">
-
     <div class="form-sec">
-      <div class="sec-title" id="secStatsTitle">Listening Stats</div>
-      <div style="margin-bottom:12px">
-        <label class="field-label" id="timeFieldLabel">Time spent listening</label>
-        <div class="field-row">
-          <div class="field"><input type="number" id="inputHours" min="0" max="999" placeholder="Hours" oninput="update()"></div>
-          <div class="field"><input type="number" id="inputMinutes" min="0" max="59" placeholder="Minutes" oninput="update()"></div>
-          <div class="field"><input type="number" id="inputPercent" min="0" max="100" placeholder="%" oninput="update()" title="Percent complete"></div>
-        </div>
-        <div style="display:flex;gap:6px;margin-top:6px">
-          <span style="font-size:11px;color:var(--muted);flex:1;text-align:center">Hours</span>
-          <span style="font-size:11px;color:var(--muted);flex:1;text-align:center">Minutes</span>
-          <span style="font-size:11px;color:var(--muted);flex:1;text-align:center">Percent complete</span>
-        </div>
+      <div class="sec-title">Listening Stats</div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">Hours</label><input type="number" id="inputHours" min="0" max="999" placeholder="0" oninput="update()"></div>
+        <div class="field"><label class="field-label">Minutes</label><input type="number" id="inputMinutes" min="0" max="59" placeholder="0" oninput="update()"></div>
+        <div class="field"><label class="field-label">% Complete</label><input type="number" id="inputPercent" min="0" max="100" placeholder="0" oninput="update()"></div>
       </div>
     </div>
-
     <div class="form-sec">
-      <div class="sec-title">Choose your custom stat</div>
-      <div class="chip-group">
-        <button class="chip active" id="chipWalked" onclick="selectStat('walked')">🚶 Distance Walked</button>
-        <button class="chip" id="chipDriven" onclick="selectStat('driven')">🚗 Distance Driven</button>
-        <button class="chip" id="chipSpeed" onclick="selectStat('speed')">⚡ Listening Speed</button>
-      </div>
-      <div class="field-row" style="align-items:flex-end;gap:10px">
-        <div class="field">
-          <label class="field-label">Stat label</label>
-          <input type="text" id="inputStatLabel" value="Distance Walked" oninput="update()">
-        </div>
-        <div id="unitField" style="width:110px;flex-shrink:0">
-          <label class="field-label">Units</label>
-          <div class="unit-toggle">
-            <button class="unit-btn active" id="unitMi" onclick="selectUnit('mi')">mi</button>
-            <button class="unit-btn" id="unitKm" onclick="selectUnit('km')">km</button>
-          </div>
-        </div>
-        <div style="width:80px;flex-shrink:0">
-          <label class="field-label" id="statValLabel">Distance</label>
-          <input type="number" id="inputStatValue" min="0" step="any" placeholder="0" oninput="update()">
-        </div>
-      </div>
-    </div>
-
-    <div class="form-sec" id="audiobookSec">
-      <div class="switch-row" style="margin-bottom:14px">
-        <div class="sec-title" style="margin-bottom:0">
-          Audiobook
-          <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:var(--muted)">(Optional)</span>
-        </div>
-        <div class="switch-inner" onclick="toggleHideGraphic()">
-          <span class="switch-label">Hide graphic</span>
-          <div class="switch" id="hideSwitch"></div>
-        </div>
-      </div>
+      <div class="sec-title">Audiobook <span class="sec-opt">(Optional)</span></div>
       <div>
         <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
-          <label class="field-label" style="margin-bottom:0">Audiobook cover</label>
-          <button onclick="resetCover()" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Reset to default</button>
+          <label class="field-label" style="margin-bottom:0">Cover</label>
+          <button onclick="resetCover()" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Remove</button>
         </div>
         <div class="cover-drop" id="coverDrop" onclick="document.getElementById('coverFileInput').click()">
           <div class="cover-drop-icon">🎧</div>
-          <div class="cover-drop-text">Screenshot your audiobook or Google the cover and upload it. Square works best.</div>
+          <div class="cover-drop-text">Upload your audiobook cover. Square works best.</div>
           <img class="cover-preview-img" id="coverPreviewImg" alt="Cover">
         </div>
         <input type="file" id="coverFileInput" accept="image/*" onchange="handleCoverUpload(event)">
       </div>
+      <div style="margin-bottom:12px">
+        <label class="field-label">Book title</label>
+        <input type="text" id="inputBookTitle" placeholder="e.g. Atomic Habits" oninput="update()">
+      </div>
       <div>
-        <label class="field-label">Audiobook title</label>
-        <input type="text" id="inputBookTitle" placeholder="e.g. The Hitchhiker's Guide to the Galaxy" oninput="update()">
+        <label class="field-label">Extra stat <span style="color:#c0bbb5;font-weight:400">(optional free text)</span></label>
+        <input type="text" id="inputExtra" placeholder="e.g. 3.2 mi walked" oninput="update()">
       </div>
     </div>
-
     <div class="form-sec">
-      <div class="sec-title">Color &amp; Background Preview</div>
-      <div style="margin-bottom:16px">
-        <label class="field-label" style="margin-bottom:8px">Font color</label>
-        <div class="font-toggle">
-          <button class="font-btn active" id="fontBlack" onclick="setFontColor('black')">Black</button>
-          <button class="font-btn" id="fontWhite" onclick="setFontColor('white')">White</button>
-        </div>
-      </div>
-      <label class="field-label">Try it on a background</label>
-      <div class="swatch-hint">See how your font color looks on different backgrounds before you share.</div>
+      <div class="sec-title">Background</div>
       <div class="swatch-row" id="swatchRow"></div>
       <input type="file" id="bgFileInput" accept="image/*" onchange="handleBgUpload(event)">
     </div>
-
   </div>
-
   <div class="preview-wrap">
     <div class="preview-title">Preview</div>
     <div id="statCard" class="card-transparent"></div>
   </div>
-
   <button class="save-btn" id="saveBtn" onclick="downloadStat()">
     ↓ Save Your BeFreed Stat
     <span class="save-btn-sub">Opens image to save to camera roll</span>
   </button>
-
 </div>
-
 <script>
-const S = {
-  mode: 'audiobook', hours: 0, minutes: 0, percent: 0,
-  statType: 'walked', statLabel: 'Distance Walked', statUnit: 'mi', statValue: 0,
-  hideGraphic: false, coverUrl: null, bookTitle: '',
-  fontColor: 'black', bgId: 'transparent', customBgUrl: null,
-};
-
+const S = { hours:0, minutes:0, percent:0, extra:'', coverUrl:null, bookTitle:'', bgId:'transparent', customBgUrl:null };
 const BG = [
-  { id:'transparent', type:'transparent', css:null },
-  { id:'sunset',  type:'gradient', swatch:'linear-gradient(135deg,#f6d365,#fda085)', css:'linear-gradient(135deg,#f6d365 0%,#fda085 100%)' },
-  { id:'rose',    type:'gradient', swatch:'linear-gradient(135deg,#f093fb,#f5576c)', css:'linear-gradient(135deg,#f093fb 0%,#f5576c 100%)' },
-  { id:'ocean',   type:'gradient', swatch:'linear-gradient(135deg,#667eea,#764ba2)', css:'linear-gradient(135deg,#667eea 0%,#764ba2 100%)' },
-  { id:'forest',  type:'gradient', swatch:'linear-gradient(135deg,#134e5e,#71b280)', css:'linear-gradient(135deg,#134e5e 0%,#71b280 100%)' },
-  { id:'lav',     type:'gradient', swatch:'linear-gradient(135deg,#a18cd1,#fbc2eb)', css:'linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%)' },
-  { id:'gold',    type:'gradient', swatch:'linear-gradient(135deg,#f7971e,#ffd200)', css:'linear-gradient(135deg,#f7971e 0%,#ffd200 100%)' },
-  { id:'night',   type:'gradient', swatch:'linear-gradient(135deg,#0f0c29,#302b63)', css:'linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)' },
-  { id:'black',   type:'solid',    swatch:'#111', css:'#000' },
-  { id:'white',   type:'solid',    swatch:'#fff', css:'#fff' },
-  { id:'custom',  type:'upload',   css:null },
+  { id:'transparent', swatch:'transparent', css:null, fc:'#1c1c1c' },
+  { id:'sunset', swatch:'linear-gradient(135deg,#f6d365,#fda085)', css:'linear-gradient(135deg,#f6d365,#fda085)', fc:'#1c1c1c' },
+  { id:'rose',   swatch:'linear-gradient(135deg,#f093fb,#f5576c)', css:'linear-gradient(135deg,#f093fb,#f5576c)', fc:'#ffffff' },
+  { id:'ocean',  swatch:'linear-gradient(135deg,#667eea,#764ba2)', css:'linear-gradient(135deg,#667eea,#764ba2)', fc:'#ffffff' },
+  { id:'forest', swatch:'linear-gradient(135deg,#134e5e,#71b280)', css:'linear-gradient(135deg,#134e5e,#71b280)', fc:'#ffffff' },
+  { id:'lav',    swatch:'linear-gradient(135deg,#a18cd1,#fbc2eb)', css:'linear-gradient(135deg,#a18cd1,#fbc2eb)', fc:'#1c1c1c' },
+  { id:'gold',   swatch:'linear-gradient(135deg,#f7971e,#ffd200)', css:'linear-gradient(135deg,#f7971e,#ffd200)', fc:'#1c1c1c' },
+  { id:'night',  swatch:'linear-gradient(135deg,#0f0c29,#302b63)', css:'linear-gradient(135deg,#0f0c29,#302b63)', fc:'#ffffff' },
+  { id:'black',  swatch:'#111', css:'#000', fc:'#ffffff' },
+  { id:'white',  swatch:'#fff', css:'#fff', fc:'#1c1c1c' },
+  { id:'custom', swatch:'upload', css:null, fc:'#ffffff' },
 ];
-
 function initSwatches() {
   const row = document.getElementById('swatchRow');
-  row.innerHTML = '';
   BG.forEach(bg => {
     const el = document.createElement('div');
-    el.className = 'swatch' + (bg.id==='transparent' ? ' sw-transparent' : '') + (bg.id==='custom' ? ' sw-upload' : '') + (bg.id==='white' ? ' sw-white' : '');
+    el.className = 'swatch' + (bg.id==='transparent'?' sw-transparent':'') + (bg.id==='custom'?' sw-upload':'') + (bg.id==='white'?' sw-white':'');
     el.dataset.bgid = bg.id;
-    if (bg.id === 'custom') { el.textContent = '+'; }
-    else if (bg.type === 'gradient' || bg.type === 'solid') { el.style.background = bg.swatch; }
-    if (bg.id === S.bgId) el.classList.add('sel');
+    if (bg.id==='custom') el.textContent='+';
+    else if (bg.swatch!=='transparent') el.style.background=bg.swatch;
+    if (bg.id===S.bgId) el.classList.add('sel');
     el.addEventListener('click', () => {
-      if (bg.id === 'custom') { document.getElementById('bgFileInput').click(); }
-      else { S.bgId = bg.id; S.customBgUrl = null; refreshSwatches(); update(); }
+      if (bg.id==='custom') { document.getElementById('bgFileInput').click(); return; }
+      S.bgId=bg.id; S.customBgUrl=null; refreshSwatches(); update();
     });
     row.appendChild(el);
   });
 }
-
 function refreshSwatches() {
-  document.querySelectorAll('#swatchRow .swatch').forEach(el => {
-    el.classList.toggle('sel', el.dataset.bgid === S.bgId);
-  });
+  document.querySelectorAll('#swatchRow .swatch').forEach(el => el.classList.toggle('sel', el.dataset.bgid===S.bgId));
 }
-
-function setMode(m) {
-  S.mode = m;
-  document.getElementById('modeBook').classList.toggle('active', m==='book');
-  document.getElementById('modeAudio').classList.toggle('active', m==='audiobook');
-  document.getElementById('secStatsTitle').textContent = m==='book' ? 'Reading Stats' : 'Listening Stats';
-  document.getElementById('timeFieldLabel').textContent = m==='book' ? 'Time spent reading' : 'Time spent listening';
-  document.getElementById('audiobookSec').style.display = m==='audiobook' ? '' : 'none';
-  update();
-}
-
-const STAT_DEF = {
-  walked: { label:'Distance Walked', unit:'mi', valLabel:'Distance', isSpeed:false },
-  driven: { label:'Distance Driven', unit:'mi', valLabel:'Distance', isSpeed:false },
-  speed:  { label:'Listening Speed', unit:'x',  valLabel:'Speed',    isSpeed:true  },
-};
-
-function selectStat(type) {
-  S.statType = type;
-  const d = STAT_DEF[type];
-  S.statLabel = d.label; S.statUnit = d.unit;
-  document.getElementById('inputStatLabel').value = d.label;
-  document.getElementById('statValLabel').textContent = d.valLabel;
-  document.getElementById('unitField').style.display = d.isSpeed ? 'none' : '';
-  if (!d.isSpeed) selectUnit('mi');
-  ['walked','driven','speed'].forEach(k => {
-    document.getElementById('chip'+k[0].toUpperCase()+k.slice(1)).classList.toggle('active', k===type);
-  });
-  update();
-}
-
-function selectUnit(u) {
-  S.statUnit = u;
-  document.getElementById('unitMi').classList.toggle('active', u==='mi');
-  document.getElementById('unitKm').classList.toggle('active', u==='km');
-  update();
-}
-
-function setFontColor(c) {
-  S.fontColor = c;
-  document.getElementById('fontBlack').classList.toggle('active', c==='black');
-  document.getElementById('fontWhite').classList.toggle('active', c==='white');
-  update();
-}
-
-function toggleHideGraphic() {
-  S.hideGraphic = !S.hideGraphic;
-  document.getElementById('hideSwitch').classList.toggle('on', S.hideGraphic);
-  update();
-}
-
 function handleCoverUpload(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    S.coverUrl = ev.target.result;
-    document.getElementById('coverPreviewImg').src = ev.target.result;
-    document.getElementById('coverDrop').classList.add('has-img');
-    update();
-  };
-  reader.readAsDataURL(file);
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{ S.coverUrl=ev.target.result; document.getElementById('coverPreviewImg').src=ev.target.result; document.getElementById('coverDrop').classList.add('has-img'); update(); };
+  r.readAsDataURL(file);
 }
-
 function resetCover() {
-  S.coverUrl = null;
-  document.getElementById('coverDrop').classList.remove('has-img');
-  document.getElementById('coverPreviewImg').src = '';
-  document.getElementById('coverFileInput').value = '';
-  update();
+  S.coverUrl=null; document.getElementById('coverDrop').classList.remove('has-img');
+  document.getElementById('coverPreviewImg').src=''; document.getElementById('coverFileInput').value=''; update();
 }
-
 function handleBgUpload(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    S.customBgUrl = ev.target.result; S.bgId = 'custom';
-    refreshSwatches(); update();
-  };
-  reader.readAsDataURL(file);
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{ S.customBgUrl=ev.target.result; S.bgId='custom'; refreshSwatches(); update(); };
+  r.readAsDataURL(file);
 }
-
 function headphonesIcon(color) {
-  return `<svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M 20 60 C 20 16 100 16 100 60" stroke="${color}" stroke-width="5.5" fill="none" stroke-linecap="round"/>
-    <rect x="4" y="54" width="26" height="40" rx="12" stroke="${color}" stroke-width="4.5" fill="none"/>
-    <rect x="90" y="54" width="26" height="40" rx="12" stroke="${color}" stroke-width="4.5" fill="none"/>
-  </svg>`;
+  return `<svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 20 60 C 20 16 100 16 100 60" stroke="${color}" stroke-width="5.5" fill="none" stroke-linecap="round"/><rect x="4" y="54" width="26" height="40" rx="12" stroke="${color}" stroke-width="4.5" fill="none"/><rect x="90" y="54" width="26" height="40" rx="12" stroke="${color}" stroke-width="4.5" fill="none"/></svg>`;
 }
-
-function bookIcon(color) {
-  return `<svg viewBox="0 0 110 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="8" y="4" width="94" height="88" rx="7" stroke="${color}" stroke-width="4.5" fill="none"/>
-    <line x1="55" y1="4" x2="55" y2="92" stroke="${color}" stroke-width="3.5"/>
-    <line x1="16" y1="28" x2="47" y2="28" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-    <line x1="16" y1="41" x2="47" y2="41" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-    <line x1="16" y1="54" x2="47" y2="54" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-    <line x1="16" y1="67" x2="38" y2="67" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-  </svg>`;
-}
-
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function getFontColor() { const bg=BG.find(b=>b.id===S.bgId); return bg?bg.fc:'#1c1c1c'; }
 function readInputs() {
-  S.hours     = parseInt(document.getElementById('inputHours').value)    || 0;
-  S.minutes   = parseInt(document.getElementById('inputMinutes').value)  || 0;
-  S.percent   = parseInt(document.getElementById('inputPercent').value)  || 0;
-  S.statLabel = document.getElementById('inputStatLabel').value || '';
-  S.statValue = parseFloat(document.getElementById('inputStatValue').value) || 0;
-  S.bookTitle = document.getElementById('inputBookTitle').value || '';
+  S.hours=parseInt(document.getElementById('inputHours').value)||0;
+  S.minutes=parseInt(document.getElementById('inputMinutes').value)||0;
+  S.percent=parseInt(document.getElementById('inputPercent').value)||0;
+  S.bookTitle=document.getElementById('inputBookTitle').value||'';
+  S.extra=document.getElementById('inputExtra').value||'';
 }
-
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
 function buildCard() {
-  const fc = S.fontColor==='white' ? '#ffffff' : '#1c1c1c';
-  const iconColor = '#E05B44';
-  const timeStr = `${S.hours||0}h ${String(S.minutes||0).padStart(2,'0')}m`;
-  const pct = S.percent || 0;
-  const statVal = S.statType==='speed' ? `${S.statValue||0}x` : `${S.statValue||0} ${S.statUnit}`;
-  const timeLabel = S.mode==='audiobook' ? 'Time Spent Listening' : 'Time Spent Reading';
-  const iconHtml = S.hideGraphic ? '' : `<div class="c-icon">${S.mode==='audiobook' ? headphonesIcon(iconColor) : bookIcon(iconColor)}</div>`;
-  const coverHtml = (S.mode==='audiobook' && S.coverUrl) ? `<img class="c-cover" src="${S.coverUrl}" alt="Cover">` : '';
-  const titleHtml = S.bookTitle ? `<div class="c-book-title" style="color:${fc}">${esc(S.bookTitle)}</div>` : '';
-  const statRow = S.statLabel ? `<div class="c-stat"><div class="c-stat-label" style="color:${fc}">${esc(S.statLabel)}</div><div class="c-stat-value" style="color:${fc}">${esc(statVal)}</div></div>` : '';
-  return `
-    <div class="c-stats">
-      <div class="c-stat">
-        <div class="c-stat-label" style="color:${fc}">${timeLabel}</div>
-        <div class="c-stat-value" style="color:${fc}">${timeStr}</div>
-      </div>
-      <div class="c-stat">
-        <div class="c-stat-label" style="color:${fc}">Percent Complete</div>
-        <div class="c-stat-value underlined" style="color:${fc}">${pct}%</div>
-      </div>
-      ${statRow}
-    </div>
-    ${iconHtml}${coverHtml}${titleHtml}
-    <div class="c-brand">
-      <div class="c-brand-name" style="color:${fc}">BeFreed</div>
-      <div class="c-brand-tag" style="color:${fc}">Reading Stats</div>
-    </div>`;
+  const fc=getFontColor();
+  const timeStr=`${S.hours||0}h ${String(S.minutes||0).padStart(2,'0')}m`;
+  const pct=S.percent||0;
+  const extraHtml=S.extra?`<div class="c-extra" style="color:${fc}">${esc(S.extra)}</div>`:'';
+  const coverHtml=S.coverUrl?`<img class="c-cover" src="${S.coverUrl}" alt="Cover">`:''
+  const titleHtml=S.bookTitle?`<div class="c-book-title" style="color:${fc}">${esc(S.bookTitle)}</div>`:'';
+  const iconColor=fc==='#ffffff'?'#ffffff':'#E05B44';
+  return `<div class="c-stats"><div class="c-stat"><div class="c-stat-label" style="color:${fc}">Time Spent Listening</div><div class="c-stat-value" style="color:${fc}">${timeStr}</div></div><div class="c-stat"><div class="c-stat-label" style="color:${fc}">Percent Complete</div><div class="c-stat-value underlined" style="color:${fc}">${pct}%</div></div>${extraHtml}</div><div class="c-icon">${headphonesIcon(iconColor)}</div>${coverHtml}${titleHtml}<div class="c-brand"><div class="c-brand-name" style="color:${fc}">BeFreed</div><div class="c-brand-tag" style="color:${fc}">Listening Stats</div></div>`;
 }
-
 function applyCardBg(card) {
-  const bg = BG.find(b => b.id===S.bgId);
-  card.style.backgroundImage = '';
-  card.style.backgroundColor = '';
-  card.style.backgroundSize = '';
-  card.style.backgroundPosition = '';
+  const bg=BG.find(b=>b.id===S.bgId);
+  card.style.backgroundImage=''; card.style.backgroundColor=''; card.style.backgroundSize=''; card.style.backgroundPosition='';
   if (S.bgId==='transparent') { card.className='card-transparent'; return; }
-  card.className = '';
-  if (S.bgId==='custom' && S.customBgUrl) {
-    card.style.backgroundImage = `url('${S.customBgUrl}')`;
-    card.style.backgroundSize = 'cover';
-    card.style.backgroundPosition = 'center';
-  } else if (bg) { card.style.background = bg.css; }
+  card.className='';
+  if (S.bgId==='custom'&&S.customBgUrl) { card.style.backgroundImage=`url('${S.customBgUrl}')`; card.style.backgroundSize='cover'; card.style.backgroundPosition='center'; }
+  else if (bg?.css) card.style.background=bg.css;
 }
-
 function update() {
   readInputs();
-  const card = document.getElementById('statCard');
-  card.innerHTML = buildCard();
+  const card=document.getElementById('statCard');
+  card.innerHTML=buildCard();
   applyCardBg(card);
 }
-
 async function downloadStat() {
-  const btn = document.getElementById('saveBtn');
-  btn.disabled = true;
-  btn.innerHTML = 'Saving… <span class="save-btn-sub">Please wait</span>';
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true; btn.innerHTML='Saving… <span class="save-btn-sub">Please wait</span>';
   try {
     await document.fonts.ready;
-    const card = document.getElementById('statCard');
-    const isTransparent = S.bgId==='transparent';
-    const clone = card.cloneNode(true);
-    clone.style.position='fixed'; clone.style.top='-9999px'; clone.style.left='-9999px'; clone.style.zIndex='-999';
-    if (isTransparent) { clone.className=''; clone.style.background='transparent'; }
-    else { clone.className=card.className; clone.style.cssText += ';'+card.style.cssText; }
+    const card=document.getElementById('statCard');
+    const isT=S.bgId==='transparent';
+    const clone=card.cloneNode(true);
+    clone.style.cssText='position:fixed;top:-9999px;left:-9999px;z-index:-999;width:'+card.offsetWidth+'px;min-height:'+card.offsetHeight+'px;display:flex;flex-direction:column;align-items:center;padding:38px 28px 28px;font-family:Inter,sans-serif;';
+    if (isT) { clone.className=''; clone.style.background='transparent'; }
+    else if (S.bgId==='custom'&&S.customBgUrl) { clone.style.backgroundImage=`url('${S.customBgUrl}')`; clone.style.backgroundSize='cover'; clone.style.backgroundPosition='center'; }
+    else { const bg=BG.find(b=>b.id===S.bgId); if(bg?.css) clone.style.background=bg.css; }
     document.body.appendChild(clone);
     let canvas;
-    try {
-      canvas = await html2canvas(clone, {
-        backgroundColor: isTransparent ? null : undefined,
-        scale: 2, useCORS: true, allowTaint: true, logging: false,
-        width: card.offsetWidth,
-        height: Math.max(card.offsetHeight, card.scrollHeight),
-      });
-    } finally { document.body.removeChild(clone); }
-    const link = document.createElement('a');
-    link.download='befreed-stat.png';
-    link.href=canvas.toDataURL('image/png');
-    link.click();
-  } catch(err) {
-    console.error('Export error:', err);
-    alert('Export failed — please try again.');
-  } finally {
-    btn.disabled=false;
-    btn.innerHTML='↓ Save Your BeFreed Stat<span class="save-btn-sub">Opens image to save to camera roll</span>';
-  }
+    try { canvas=await html2canvas(clone,{backgroundColor:isT?null:undefined,scale:2,useCORS:true,allowTaint:true,logging:false,width:card.offsetWidth,height:Math.max(card.offsetHeight,card.scrollHeight)}); }
+    finally { document.body.removeChild(clone); }
+    const link=document.createElement('a'); link.download='befreed-stat.png'; link.href=canvas.toDataURL('image/png'); link.click();
+  } catch(err) { console.error(err); alert('Export failed — please try again.'); }
+  finally { btn.disabled=false; btn.innerHTML='↓ Save Your BeFreed Stat<span class="save-btn-sub">Opens image to save to camera roll</span>'; }
 }
-
-initSwatches();
-update();
+initSwatches(); update();
 </script>
 </body>
 </html>
