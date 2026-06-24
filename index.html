@@ -511,6 +511,256 @@
       color: #78716c;
       line-height: 1.5;
     }
+
+    /* ── PODCAST ── */
+    #podcast-panel {
+      flex: 1;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+    }
+    .podcast-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 14px 100px;
+    }
+    .podcast-scroll::-webkit-scrollbar { width: 4px; }
+    .podcast-scroll::-webkit-scrollbar-track { background: transparent; }
+    .podcast-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+    .pod-hero {
+      background: linear-gradient(135deg, #4c1d95 0%, #1e293b 60%);
+      border: 1px solid #6d28d9;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .pod-hero h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #f5f3ff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .pod-hero p {
+      font-size: 11px;
+      color: #c4b5fd;
+      line-height: 1.5;
+    }
+
+    .pod-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #64748b;
+      margin: 14px 2px 8px;
+    }
+
+    .pod-presets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .pod-preset {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      text-align: left;
+    }
+    .pod-preset:hover { border-color: #a78bfa; background: #14132b; }
+    .pod-preset .pp-title { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 2px; }
+    .pod-preset .pp-sub { font-size: 10px; color: #64748b; }
+
+    .pod-add-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .pod-add-row select {
+      flex: 1;
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 12px;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+    .pod-add-row button {
+      background: #6d28d9;
+      color: #f5f3ff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .pod-add-row button:hover { background: #7c3aed; }
+
+    .pod-queue-empty {
+      font-size: 11px;
+      color: #475569;
+      text-align: center;
+      padding: 18px;
+      border: 1px dashed #334155;
+      border-radius: 10px;
+    }
+    .pod-seg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 9px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      transition: border-color .15s, background .15s;
+    }
+    .pod-seg.playing { border-color: #a78bfa; background: #14132b; }
+    .pod-seg .ps-handle {
+      font-size: 14px;
+      color: #475569;
+      cursor: grab;
+      user-select: none;
+    }
+    .pod-seg .ps-idx {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #1e293b;
+      font-size: 10px; font-weight: 700;
+      color: #94a3b8;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .pod-seg.playing .ps-idx { background: #6d28d9; color: #f5f3ff; }
+    .pod-seg .ps-body { flex: 1; min-width: 0; }
+    .pod-seg .ps-name { font-size: 12px; font-weight: 600; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pod-seg .ps-meta { font-size: 10px; color: #64748b; margin-top: 1px; }
+    .pod-seg .ps-remove {
+      background: none; border: none; color: #475569;
+      font-size: 16px; cursor: pointer; padding: 0 2px; line-height: 1;
+    }
+    .pod-seg .ps-remove:hover { color: #f87171; }
+
+    .pod-clear {
+      background: none;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .pod-clear:hover { border-color: #f87171; color: #f87171; }
+
+    .pod-novoice {
+      margin-top: 12px;
+      padding: 8px 10px;
+      background: #1c1917;
+      border: 1px solid #44403c;
+      border-radius: 8px;
+      font-size: 10px;
+      color: #a8a29e;
+      line-height: 1.5;
+    }
+
+    /* Fixed player bar at bottom of sidebar */
+    .pod-player {
+      flex-shrink: 0;
+      border-top: 1px solid #334155;
+      background: #1e293b;
+      padding: 10px 14px 12px;
+      display: none;
+    }
+    .pod-player.show { display: block; }
+    .pod-now {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pod-now strong { color: #e2e8f0; }
+    .pod-now .who { color: #a78bfa; font-weight: 700; }
+    .pod-caption {
+      font-size: 11px;
+      color: #cbd5e1;
+      line-height: 1.45;
+      min-height: 30px;
+      margin-bottom: 8px;
+      max-height: 54px;
+      overflow-y: auto;
+    }
+    .pod-progress {
+      height: 4px;
+      background: #0f172a;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .pod-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #7c3aed, #a78bfa);
+      transition: width .25s linear;
+    }
+    .pod-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .pod-btn {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      border-radius: 8px;
+      height: 38px;
+      min-width: 44px;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color .15s, background .15s;
+    }
+    .pod-btn:hover { border-color: #a78bfa; }
+    .pod-btn:disabled { opacity: .35; cursor: default; }
+    .pod-btn.play {
+      background: #6d28d9;
+      border-color: #6d28d9;
+      color: #f5f3ff;
+      flex: 1;
+      font-weight: 700;
+      font-size: 14px;
+      gap: 6px;
+    }
+    .pod-btn.play:hover { background: #7c3aed; border-color: #7c3aed; }
+    .pod-rate {
+      background: #0f172a;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      height: 38px;
+      font-size: 11px;
+      padding: 0 6px;
+      cursor: pointer;
+      appearance: none;
+      outline: none;
+    }
   </style>
 </head>
 <body>
@@ -547,6 +797,7 @@
       <div class="tab active" data-tab="rankings">Rankings</div>
       <div class="tab" data-tab="detail">Detail</div>
       <div class="tab" data-tab="listings">Listings</div>
+      <div class="tab" data-tab="podcast">🎧 Podcast</div>
     </div>
 
     <!-- Rankings tab -->
@@ -627,6 +878,50 @@
       </div>
       <div class="listings-count" id="listingsCount"><span>0</span> listings found</div>
       <div class="listings-scroll" id="listingsScroll"></div>
+    </div>
+
+    <!-- Podcast tab -->
+    <div id="podcast-panel">
+      <div class="podcast-scroll">
+        <div class="pod-hero">
+          <h3>🎧 The SF Multifamily Brief</h3>
+          <p>Two AI hosts — <strong>Maya</strong> &amp; <strong>Dev</strong> — break down each neighborhood as an investment. Build an episode from the "pieces" below and press play. Audio is generated live in your browser.</p>
+        </div>
+
+        <div class="pod-section-label">Instant episodes</div>
+        <div class="pod-presets" id="podPresets"></div>
+
+        <div class="pod-section-label">Build your own episode</div>
+        <div class="pod-add-row">
+          <select id="podAddSelect"></select>
+          <button id="podAddBtn">+ Add</button>
+        </div>
+        <div id="podQueue"></div>
+        <button class="pod-clear" id="podClearBtn" style="display:none">Clear queue</button>
+
+        <div class="pod-novoice" id="podNoVoice" style="display:none">
+          ⚠️ Your browser didn't expose speech voices. Try Chrome, Edge, or Safari — the podcast uses the built-in Web Speech API (no internet or API key required).
+        </div>
+      </div>
+
+      <!-- Player bar -->
+      <div class="pod-player" id="podPlayer">
+        <div class="pod-now" id="podNow">Ready to play</div>
+        <div class="pod-caption" id="podCaption">Press play to start your episode.</div>
+        <div class="pod-progress"><div class="pod-progress-fill" id="podProgressFill"></div></div>
+        <div class="pod-controls">
+          <button class="pod-btn" id="podPrev" title="Previous segment">⏮</button>
+          <button class="pod-btn play" id="podPlay"><span id="podPlayIcon">▶</span> <span id="podPlayLabel">Play</span></button>
+          <button class="pod-btn" id="podNext" title="Next segment">⏭</button>
+          <select class="pod-rate" id="podRate" title="Playback speed">
+            <option value="0.85">0.85×</option>
+            <option value="1" selected>1×</option>
+            <option value="1.15">1.15×</option>
+            <option value="1.3">1.3×</option>
+            <option value="1.5">1.5×</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1224,6 +1519,10 @@ function renderDetail(name) {
       <span class="score-badge" style="background:${scoreBg};color:${scoreColor}">
         ${score}/100 — ${scoreLabel}
       </span>
+      <button onclick="podAdd('${n.name.replace(/'/g, "\\'")}')"
+        style="margin-left:8px;background:#0f172a;border:1px solid #6d28d9;color:#c4b5fd;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;cursor:pointer;vertical-align:middle;">
+        🎧 Add to podcast
+      </button>
     </div>
 
     <div class="metrics-grid">
@@ -1373,6 +1672,7 @@ function switchTab(tab) {
   document.getElementById('detail-panel').style.display = tab === 'detail' ? 'block' : 'none';
   const lp = document.getElementById('listings-panel');
   lp.style.display = tab === 'listings' ? 'flex' : 'none';
+  document.getElementById('podcast-panel').style.display = tab === 'podcast' ? 'flex' : 'none';
 }
 
 document.querySelectorAll('.tab').forEach(tab => {
@@ -1595,6 +1895,341 @@ function renderListings() {
 
 // Render on first load
 renderListings();
+
+// ─────────────────────────────────────────────
+//  INTERACTIVE AUDIO PODCAST  🎧
+//  Two AI hosts (Maya & Dev) narrate neighborhoods
+//  as "pieces" stitched into one episode, spoken
+//  live via the browser Web Speech API (no API key).
+// ─────────────────────────────────────────────
+const Pod = (() => {
+  const synth = window.speechSynthesis;
+  const supported = !!synth;
+
+  let queue = [];            // array of neighborhood names
+  let lines = [];            // flattened [{who, text, seg, segName}]
+  let episodeSegs = [];      // [{name, lines}]
+  let currentLine = 0;
+  let isPlaying = false;
+  let playToken = 0;
+  let playbackRate = 1;
+  let voiceMaya = null, voiceDev = null;
+
+  // ── helpers ──
+  const byName = nm => neighborhoods.find(n => n.name === nm);
+  const moneyK = v => '$' + Math.round(v / 1000) + 'K';
+  const lc = s => s.charAt(0).toLowerCase() + s.slice(1);
+  function scoreLabel(s) {
+    return s >= 70 ? 'a strong buy' : s >= 55 ? 'a solid pick'
+         : s >= 40 ? 'a fair play' : 'a higher-risk play';
+  }
+
+  // ── voice selection ──
+  function loadVoices() {
+    if (!supported) return;
+    const all = synth.getVoices().filter(v => /^en/i.test(v.lang));
+    const pool = all.length ? all : synth.getVoices();
+    const female = pool.find(v => /samantha|victoria|karen|moira|tessa|fiona|allison|ava|zira|female|google us english|google uk english female/i.test(v.name));
+    const male = pool.find(v => v !== female && /daniel|alex|fred|david|oliver|aaron|tom|rishi|male|google uk english male/i.test(v.name));
+    voiceMaya = female || pool[0] || null;
+    voiceDev = male || pool.find(v => v !== voiceMaya) || pool[0] || null;
+    document.getElementById('podNoVoice').style.display =
+      (supported && pool.length === 0) ? 'block' : 'none';
+  }
+  if (supported) {
+    loadVoices();
+    synth.onvoiceschanged = loadVoices;
+  } else {
+    document.getElementById('podNoVoice').style.display = 'block';
+    document.getElementById('podNoVoice').textContent =
+      '⚠️ This browser has no speech synthesis support. Try Chrome, Edge, or Safari to hear the podcast.';
+  }
+
+  // ── dialogue generation ──
+  function introLines(names) {
+    const list = names.length === 1 ? names[0]
+      : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+    return [
+      { who: 'Maya', text: `Hey everyone, welcome back to The SF Multifamily Brief. I'm Maya.` },
+      { who: 'Dev', text: `And I'm Dev. On today's episode we're running the numbers on ${names.length} ${names.length === 1 ? 'neighborhood' : 'neighborhoods'}: ${list}.` },
+      { who: 'Maya', text: `Quick reminder before we dive in — these figures are illustrative, so always verify with a broker or the MLS before you write a check. Alright, let's get into it.` }
+    ];
+  }
+
+  function hoodLines(n, idx, total) {
+    const grm = (n.pricePerUnit / (n.avgRent2BR * 12)).toFixed(1);
+    const opener = idx === 0 ? 'First up' : (idx === total - 1 ? 'Last on the list' : 'Next up');
+    let verdict;
+    if (n.investmentScore >= 70) verdict = `For me, this is a strong-buy — the fundamentals really line up here.`;
+    else if (n.investmentScore >= 55) verdict = `Solid all-rounder. I'd keep it on the shortlist.`;
+    else if (n.investmentScore >= 40) verdict = `It's a fair play, but you're trading yield for ${n.crimeScore >= 7 ? 'safety' : 'long-term upside'}.`;
+    else verdict = `Higher risk — honestly, this one's for experienced operators only.`;
+    return [
+      { who: 'Maya', text: `${opener}: ${n.name}. Our overall investment score here is ${n.investmentScore} out of 100 — we'd call that ${scoreLabel(n.investmentScore)}.` },
+      { who: 'Dev', text: `The money side: a ${n.capRate} percent cap rate, two-bedrooms renting around $${n.avgRent2BR.toLocaleString()} a month, and a typical unit trading near ${moneyK(n.pricePerUnit)}. That's a gross rent multiplier of about ${grm}.` },
+      { who: 'Maya', text: `Five-year rent growth is projected at ${n.rentGrowth5yr} percent, vacancy's around ${n.vacancyRate} percent, and on safety it scores ${n.crimeScore} out of 10.` },
+      { who: 'Dev', text: `What I like: ${lc(n.pros[0])}${n.pros[1] ? ', plus ' + lc(n.pros[1]) : ''}.` },
+      { who: 'Maya', text: `The catch — ${lc(n.cons[0])}${n.cons[1] ? ', and ' + lc(n.cons[1]) : ''}.` },
+      { who: 'Dev', text: verdict }
+    ];
+  }
+
+  function outroLines(names) {
+    const inQ = names.map(byName).filter(Boolean);
+    const topScore = [...inQ].sort((a, b) => b.investmentScore - a.investmentScore)[0];
+    const topCap = [...inQ].sort((a, b) => b.capRate - a.capRate)[0];
+    const out = [];
+    if (topScore) out.push({ who: 'Maya', text: `So if I had to pick just one today, I'd lean ${topScore.name} — it tops this slate on overall score.` });
+    if (topCap && (!topScore || topCap.name !== topScore.name)) out.push({ who: 'Dev', text: `And for pure yield, ${topCap.name} has the fattest cap rate of the bunch at ${topCap.capRate} percent.` });
+    out.push({ who: 'Maya', text: `That's it for this episode of The SF Multifamily Brief. Do your own diligence, and we'll catch you in the next one.` });
+    return out;
+  }
+
+  function buildEpisode() {
+    const names = queue.filter(nm => byName(nm));
+    episodeSegs = [];
+    if (!names.length) { lines = []; return; }
+    episodeSegs.push({ name: 'Intro', lines: introLines(names) });
+    names.forEach((nm, i) => episodeSegs.push({ name: nm, lines: hoodLines(byName(nm), i, names.length) }));
+    episodeSegs.push({ name: 'Wrap-up', lines: outroLines(names) });
+    lines = [];
+    episodeSegs.forEach((s, si) => s.lines.forEach(ln =>
+      lines.push({ who: ln.who, text: ln.text, seg: si, segName: s.name })));
+  }
+
+  // ── playback ──
+  function speakLine(i) {
+    if (!supported) return;
+    synth.cancel();
+    if (i >= lines.length) { finish(); return; }
+    if (i < 0) i = 0;
+    currentLine = i;
+    const ln = lines[i];
+    const myToken = ++playToken;
+    const u = new SpeechSynthesisUtterance(ln.text);
+    const maya = ln.who === 'Maya';
+    u.voice = maya ? voiceMaya : voiceDev;
+    u.lang = (u.voice && u.voice.lang) || 'en-US';
+    u.pitch = maya ? 1.12 : 0.82;
+    u.rate = playbackRate;
+    u.onend = () => {
+      if (myToken !== playToken || !isPlaying) return;
+      speakLine(currentLine + 1);
+    };
+    updateNow();
+    // small delay sidesteps a Chrome cancel-then-speak race
+    setTimeout(() => { if (myToken === playToken && isPlaying) synth.speak(u); }, 40);
+  }
+
+  function finish() {
+    isPlaying = false;
+    playToken++;
+    currentLine = lines.length ? lines.length - 1 : 0;
+    setIcon();
+    document.getElementById('podProgressFill').style.width = '100%';
+    document.getElementById('podNow').innerHTML = '✅ Episode complete';
+    document.getElementById('podCaption').textContent = 'Press play to listen again, or build a new episode.';
+    renderQueue();
+    // reset so next play starts fresh
+    currentLine = lines.length;
+  }
+
+  function togglePlay() {
+    if (!supported) return;
+    if (!lines.length) { buildEpisode(); }
+    if (!lines.length) {
+      document.getElementById('podCaption').textContent = 'Add at least one neighborhood (or pick an instant episode) first.';
+      return;
+    }
+    if (isPlaying) {
+      isPlaying = false;
+      playToken++;          // invalidate pending onend
+      synth.cancel();
+      setIcon();
+    } else {
+      isPlaying = true;
+      setIcon();
+      if (currentLine >= lines.length) currentLine = 0;
+      speakLine(currentLine);
+    }
+  }
+
+  function jumpSeg(dir) {
+    if (!lines.length) return;
+    const curSeg = lines[Math.min(currentLine, lines.length - 1)].seg;
+    let target;
+    if (dir < 0) {
+      const segStart = lines.findIndex(l => l.seg === curSeg);
+      // if we're more than 1 line into the segment, restart it; else go back one
+      target = (currentLine - segStart > 1) ? curSeg : Math.max(0, curSeg - 1);
+    } else {
+      target = Math.min(curSeg + 1, episodeSegs.length - 1);
+    }
+    const idx = lines.findIndex(l => l.seg === target);
+    if (idx < 0) return;
+    currentLine = idx;
+    if (isPlaying) speakLine(idx);
+    else updateNow();
+  }
+
+  function setIcon() {
+    document.getElementById('podPlayIcon').textContent = isPlaying ? '⏸' : '▶';
+    document.getElementById('podPlayLabel').textContent = isPlaying ? 'Pause' : 'Play';
+  }
+
+  function updateNow() {
+    const total = lines.length || 1;
+    const pct = Math.min(100, Math.round(((currentLine + 1) / total) * 100));
+    document.getElementById('podProgressFill').style.width = pct + '%';
+    const ln = lines[Math.min(currentLine, lines.length - 1)];
+    if (!ln) return;
+    const segNo = ln.seg;
+    document.getElementById('podNow').innerHTML =
+      `Segment ${segNo + 1}/${episodeSegs.length} · <strong>${ln.segName}</strong>`;
+    document.getElementById('podCaption').innerHTML =
+      `<span class="who">${ln.who}:</span> ${ln.text}`;
+    renderQueue();
+  }
+
+  // ── queue UI ──
+  function addToQueue(name) {
+    if (!byName(name) || queue.includes(name)) return;
+    queue.push(name);
+    if (!isPlaying) lines = [];   // force rebuild on next play
+    renderQueue();
+    refreshAddSelect();
+  }
+  function removeFromQueue(name) {
+    queue = queue.filter(n => n !== name);
+    if (!isPlaying) lines = [];
+    renderQueue();
+    refreshAddSelect();
+  }
+  function clearQueue() {
+    if (isPlaying) togglePlay();
+    queue = [];
+    lines = []; episodeSegs = []; currentLine = 0;
+    document.getElementById('podNow').innerHTML = 'Ready to play';
+    document.getElementById('podCaption').textContent = 'Press play to start your episode.';
+    document.getElementById('podProgressFill').style.width = '0%';
+    renderQueue();
+    refreshAddSelect();
+  }
+
+  function playingSegName() {
+    if (!isPlaying && currentLine >= lines.length) return null;
+    const ln = lines[Math.min(currentLine, lines.length - 1)];
+    return ln ? ln.segName : null;
+  }
+
+  function renderQueue() {
+    const wrap = document.getElementById('podQueue');
+    const clearBtn = document.getElementById('podClearBtn');
+    wrap.innerHTML = '';
+    if (!queue.length) {
+      wrap.innerHTML = '<div class="pod-queue-empty">No segments yet. Pick an instant episode above, or add neighborhoods one by one to build your own.</div>';
+      clearBtn.style.display = 'none';
+      return;
+    }
+    clearBtn.style.display = 'inline-block';
+    const active = playingSegName();
+    queue.forEach((nm, i) => {
+      const n = byName(nm);
+      const row = document.createElement('div');
+      row.className = 'pod-seg' + (active === nm ? ' playing' : '');
+      row.innerHTML = `
+        <span class="ps-idx">${i + 1}</span>
+        <div class="ps-body">
+          <div class="ps-name">${nm}</div>
+          <div class="ps-meta">Score ${n.investmentScore} · ${n.capRate}% cap · +${n.rentGrowth5yr}% growth</div>
+        </div>
+        <button class="ps-remove" title="Remove" data-rm="${nm}">×</button>`;
+      row.querySelector('[data-rm]').addEventListener('click', e => {
+        e.stopPropagation();
+        removeFromQueue(nm);
+      });
+      wrap.appendChild(row);
+    });
+  }
+
+  function refreshAddSelect() {
+    const sel = document.getElementById('podAddSelect');
+    const remaining = neighborhoods
+      .filter(n => !queue.includes(n.name))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    sel.innerHTML = remaining.length
+      ? remaining.map(n => `<option value="${n.name}">${n.name}</option>`).join('')
+      : '<option value="">All neighborhoods added</option>';
+  }
+
+  // ── presets ──
+  const presets = [
+    { title: 'Top 5 Picks', sub: 'Best overall scores', key: n => n.investmentScore },
+    { title: 'Highest Cap Rate', sub: 'Best yield', key: n => n.capRate },
+    { title: 'Best Rent Growth', sub: 'Fastest 5-yr growth', key: n => n.rentGrowth5yr },
+    { title: 'Safest Bets', sub: 'Top safety scores', key: n => n.crimeScore }
+  ];
+  function renderPresets() {
+    const wrap = document.getElementById('podPresets');
+    wrap.innerHTML = '';
+    presets.forEach((p, i) => {
+      const b = document.createElement('button');
+      b.className = 'pod-preset';
+      b.innerHTML = `<div class="pp-title">${p.title}</div><div class="pp-sub">${p.sub}</div>`;
+      b.addEventListener('click', () => loadPreset(i));
+      wrap.appendChild(b);
+    });
+  }
+  function loadPreset(i) {
+    const p = presets[i];
+    if (isPlaying) togglePlay();
+    queue = [...neighborhoods].sort((a, b) => p.key(b) - p.key(a)).slice(0, 5).map(n => n.name);
+    lines = []; currentLine = 0;
+    buildEpisode();
+    renderQueue();
+    refreshAddSelect();
+    togglePlay();   // auto-start the episode
+  }
+
+  // ── wire up ──
+  function init() {
+    document.getElementById('podPlayer').classList.add('show');
+    document.getElementById('podPlay').addEventListener('click', togglePlay);
+    document.getElementById('podPrev').addEventListener('click', () => jumpSeg(-1));
+    document.getElementById('podNext').addEventListener('click', () => jumpSeg(1));
+    document.getElementById('podRate').addEventListener('change', function () {
+      playbackRate = parseFloat(this.value);
+      if (isPlaying) speakLine(currentLine);   // re-speak current line at new rate
+    });
+    document.getElementById('podAddBtn').addEventListener('click', () => {
+      const v = document.getElementById('podAddSelect').value;
+      if (v) addToQueue(v);
+    });
+    if (!supported) {
+      document.getElementById('podPlay').disabled = true;
+      document.getElementById('podPrev').disabled = true;
+      document.getElementById('podNext').disabled = true;
+    }
+    renderPresets();
+    renderQueue();
+    refreshAddSelect();
+    // stop audio if user navigates away from the podcast tab
+    document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+      if (t.dataset.tab !== 'podcast' && isPlaying) togglePlay();
+    }));
+    window.addEventListener('beforeunload', () => { if (supported) synth.cancel(); });
+  }
+
+  return { init, add: addToQueue };
+})();
+
+Pod.init();
+
+// Make "Add to podcast" buttons in the detail panel work
+window.podAdd = function (name) {
+  Pod.add(name);
+  switchTab('podcast');
+};
 </script>
 </body>
 </html>
